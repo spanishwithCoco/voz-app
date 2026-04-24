@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,700;1,300;1,600&family=DM+Sans:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F5F0;
+  --surface: #FFFFFF;
+  --surface2: #F0EDE6;
+  --border: #E4DFD6;
+  --text: #1C1814;
+  --muted: #8C8680;
+  --accent: #C8601A;
+  --accent-soft: rgba(200,96,26,0.10);
+  --accent2: #2E6B9E;
+  --accent2-soft: rgba(46,107,158,0.10);
+  --green: #2A7A50;
+  --green-soft: rgba(42,122,80,0.10);
+  --yellow: #E8A820;
+  --yellow-soft: rgba(232,168,32,0.12);
+  --red: #C0392B;
+  --red-soft: rgba(192,57,43,0.10);
+  --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.11);
+  --nav-h: 68px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: var(--nav-h);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════════════════
+   SCREEN SWITCHING
+══════════════════════════════════════════ */
+.screen {
+  display: none;
+  min-height: calc(100vh - var(--nav-h));
+  animation: fadeUp .3s ease both;
+}
+.screen.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════════
+   TOP BAR (shared)
+══════════════════════════════════════════ */
+.top-bar {
+  position: sticky;
+  top: 0; z-index: 50;
+  background: rgba(247,245,240,0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.top-bar-logo {
+  font-family: 'Fraunces', serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--accent); letter-spacing: -0.5px;
+}
+.top-bar-logo span {
+  font-style: italic; font-weight: 300; font-size: 13px;
+  color: var(--muted); margin-left: 8px;
+  font-family: 'DM Sans', sans-serif;
+}
+.top-bar-logo.compact span { display: none; }
+.top-bar-right {
+  display: flex; align-items: center; gap: 10px;
+}
+.user-dot {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ══════════════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════════════ */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: rgba(247,245,240,0.96);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-around;
+  padding: 0 8px; z-index: 100;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px 20px; border-radius: 14px;
+  cursor: pointer; transition: all .18s;
+  border: none; background: none; color: var(--muted); min-width: 70px;
+}
+.nav-item.active { background: var(--accent-soft); color: var(--accent); }
+.nav-item:hover:not(.active) { background: var(--surface2); }
+.nav-icon { font-size: 22px; line-height: 1; }
+.nav-label { font-size: 10px; font-weight: 600; letter-spacing: .03em; }
+
+/* ══════════════════════════════════════════
+   SHARED UTILITIES
+══════════════════════════════════════════ */
+.main { max-width: 480px; margin: 0 auto; padding: 20px 18px 32px; }
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: 17px; font-weight: 600; color: var(--text);
+  margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-title a {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 400;
+  color: var(--accent); text-decoration: none;
+}
+
+/* ══════════════════════════════════════════
+   HOME
+══════════════════════════════════════════ */
+.greeting {
+  margin-bottom: 20px;
+  background: #2A2420; border-radius: 16px; padding: 18px 20px;
+}
+.greeting-sub {
+  font-size: 12px; color: rgba(255,255,255,.45);
+  font-family: 'Space Mono', monospace;
+  text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px;
+}
+.greeting-name {
+  font-family: 'Fraunces', serif;
+  font-size: 22px; font-weight: 600; color: #F7F5F0; line-height: 1.2;
+}
+.greeting-name em { color: var(--accent); font-style: italic; }
+
+.streak-banner {
+  background: linear-gradient(135deg, var(--accent) 0%, #E07820 100%);
+  border-radius: 16px; padding: 18px 20px;
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(200,96,26,.25);
+}
+.streak-icon { font-size: 36px; flex-shrink: 0; filter: drop-shadow(0 2px 6px rgba(0,0,0,.2)); }
+.streak-info { flex: 1; }
+.streak-num { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 700; color: #fff; line-height: 1; }
+.streak-label { font-size: 12px; color: rgba(255,255,255,.75); margin-top: 2px; }
+.streak-days { display: flex; gap: 5px; }
+.streak-day {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: rgba(255,255,255,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-family: 'Space Mono', monospace;
+  color: rgba(255,255,255,.7); flex-direction: column; gap: 2px;
+}
+.streak-day.done { background: rgba(255,255,255,.35); color: #fff; }
+.streak-day.today { background: #fff; color: var(--accent); font-weight: 700; }
+.streak-day .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;
+}
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 16px 18px; box-shadow: var(--shadow);
+  position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; right: 0;
+  width: 60px; height: 60px; border-radius: 50%; opacity: .07;
+  transform: translate(20px,-20px);
+}
+.stat-card.green::before { background: var(--green); }
+.stat-card.blue::before  { background: var(--accent2); }
+.stat-card.yellow::before { background: var(--yellow); }
+.stat-card.orange::before { background: var(--accent); }
+.stat-icon { font-size: 20px; margin-bottom: 8px; }
+.stat-num { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 700; line-height: 1; }
+.stat-label { font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 500; }
+
+.current-lesson {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 18px; margin-bottom: 20px; box-shadow: var(--shadow);
+}
+.current-lesson-label {
+  font-size: 10px; font-family: 'Space Mono', monospace;
+  text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-bottom: 6px;
+}
+.current-lesson-name {
+  font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600;
+  color: var(--text); margin-bottom: 12px;
+}
+.lesson-progress-steps { display: flex; gap: 5px; margin-bottom: 6px; }
+.lp-step {
+  flex: 1; height: 6px; border-radius: 3px; background: var(--surface2); transition: background .3s;
+}
+.lp-step.done { background: var(--green); }
+.lp-step.active { background: var(--accent); }
+.lesson-progress-label { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.btn-resume {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 12px; background: var(--accent); color: #fff;
+  border: none; border-radius: 12px;
+  font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+  cursor: pointer; transition: all .2s;
+  box-shadow: 0 3px 12px rgba(200,96,26,.3);
+}
+.btn-resume:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(200,96,26,.35); }
+
+.lesson-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 14px;
+  box-shadow: var(--shadow); cursor: pointer; transition: all .18s;
+}
+.lesson-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.lesson-card-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: var(--accent-soft);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.lesson-card-icon.done { background: var(--green-soft); }
+.lesson-card-info { flex: 1; min-width: 0; }
+.lesson-card-name {
+  font-weight: 600; font-size: 13px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lesson-card-meta { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: 'Space Mono', monospace; }
+.lesson-card-badge {
+  font-size: 10px; padding: 3px 8px; border-radius: 20px; font-weight: 600; white-space: nowrap; flex-shrink: 0;
+}
+.badge-done { background: var(--green-soft); color: var(--green); }
+.badge-wip  { background: var(--accent-soft); color: var(--accent); }
+.badge-new  { background: var(--surface2); color: var(--muted); }
+
+/* ══════════════════════════════════════════
+   LESSONS PAGE
+══════════════════════════════════════════ */
+.page-header {
+  display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 18px;
+}
+.page-title { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700; color: var(--text); }
+.page-count { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+.view-toggle { display: flex; gap: 6px; margin-bottom: 14px; }
+.view-btn {
+  padding: 7px 14px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface);
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+  color: var(--muted); cursor: pointer; transition: all .18s;
+  display: flex; align-items: center; gap: 5px;
+}
+.view-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.filter-tabs {
+  display: flex; gap: 6px; overflow-x: auto;
+  padding-bottom: 4px; margin-bottom: 18px; scrollbar-width: none;
+}
+.filter-tabs::-webkit-scrollbar { display: none; }
+.filter-tab {
+  padding: 7px 14px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--surface);
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+  color: var(--muted); cursor: pointer; transition: all .18s;
+  white-space: nowrap; flex-shrink: 0;
+}
+.filter-tab.active { background: var(--text); color: #fff; border-color: var(--text); }
+.filter-tab .dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  margin-right: 5px; vertical-align: middle;
+}
+.dot-all    { background: var(--muted); }
+.dot-done   { background: var(--green); }
+.dot-wip    { background: var(--accent); }
+.dot-new    { background: var(--accent2); }
+
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.lesson-card-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden; box-shadow: var(--shadow);
+  cursor: pointer; transition: all .2s;
+}
+.lesson-card-item:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,.1); }
+.lesson-card-thumb {
+  height: 88px; display: flex; align-items: center; justify-content: center;
+  font-size: 36px; position: relative;
+}
+.lesson-card-thumb.done   { background: var(--green-soft); }
+.lesson-card-thumb.wip    { background: var(--accent-soft); }
+.lesson-card-thumb.new    { background: var(--accent2-soft); }
+.status-pip { position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; border-radius: 50%; }
+.pip-done { background: var(--green); }
+.pip-wip  { background: var(--accent); }
+.pip-new  { background: var(--accent2); }
+.lesson-card-body { padding: 12px 12px 14px; }
+.lesson-card-name { font-weight: 600; font-size: 13px; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lesson-card-meta { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; margin-bottom: 10px; }
+.lesson-card-progress { display: flex; gap: 3px; margin-bottom: 10px; }
+.lcp { flex: 1; height: 4px; border-radius: 2px; background: var(--surface2); }
+.lcp.done { background: var(--green); }
+.lcp.active { background: var(--accent); }
+.btn-card-action {
+  width: 100%; padding: 8px; border: none; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all .18s;
+}
+.btn-card-action.done  { background: var(--green-soft); color: var(--green); }
+.btn-card-action.wip   { background: var(--accent-soft); color: var(--accent); }
+.btn-card-action.new   { background: var(--accent2-soft); color: var(--accent2); }
+.lesson-stars { display: flex; gap: 3px; align-items: center; margin-bottom: 5px; }
+.star { font-size: 13px; line-height: 1; transition: transform .2s; }
+.star.filled { filter: none; opacity: 1; }
+.star.empty  { filter: grayscale(1); opacity: 0.3; }
+
+.lesson-list-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 14px;
+  box-shadow: var(--shadow); cursor: pointer; transition: all .18s;
+}
+.lesson-list-item:hover { border-color: var(--accent); transform: translateY(-1px); }
+.lesson-list-icon {
+  width: 46px; height: 46px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.lesson-list-icon.done  { background: var(--green-soft); }
+.lesson-list-icon.wip   { background: var(--accent-soft); }
+.lesson-list-icon.new   { background: var(--accent2-soft); }
+.lesson-list-info { flex: 1; min-width: 0; }
+.lesson-list-name { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+.lesson-list-meta { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; margin-bottom: 6px; }
+.lesson-list-progress { display: flex; gap: 3px; }
+.llp { flex: 1; height: 3px; border-radius: 2px; background: var(--surface2); }
+.llp.done   { background: var(--green); }
+.llp.active { background: var(--accent); }
+.btn-list-action {
+  padding: 8px 14px; border: none; border-radius: 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .18s; white-space: nowrap; flex-shrink: 0;
+}
+.btn-list-action.done { background: var(--green-soft); color: var(--green); }
+.btn-list-action.wip  { background: var(--accent); color: #fff; box-shadow: 0 2px 10px rgba(200,96,26,.25); }
+.btn-list-action.new  { background: var(--accent2-soft); color: var(--accent2); }
+.empty-msg { text-align: center; padding: 48px 20px; color: var(--muted); font-size: 14px; }
+.empty-msg .emoji { font-size: 36px; margin-bottom: 12px; }
+
+/* ══════════════════════════════════════════
+   VOCABULARY PAGE
+══════════════════════════════════════════ */
+.dict-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 17px; cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.dict-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+
+.sheet-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.4);
+  z-index: 200; opacity: 0; pointer-events: none; transition: opacity .3s;
+}
+.sheet-overlay.show { opacity: 1; pointer-events: auto; }
+.dict-sheet {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  max-height: 75vh; min-height: 75vh; background: var(--surface);
+  border-radius: 20px 20px 0 0; z-index: 201;
+  transform: translateY(100%);
+  transition: transform .35s cubic-bezier(.32,0,.67,0);
+  display: flex; flex-direction: column;
+  box-shadow: 0 -8px 40px rgba(0,0,0,.15);
+}
+.dict-sheet.show {
+  transform: translateY(0);
+  transition-timing-function: cubic-bezier(.33,1,.68,1);
+}
+.sheet-handle-wrap {
+  padding: 16px 20px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0; border-bottom: 1px solid var(--border); position: relative;
+}
+.sheet-handle {
+  width: 36px; height: 4px; border-radius: 2px; background: var(--border);
+  position: absolute; left: 50%; transform: translateX(-50%); top: 8px;
+}
+.sheet-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 700; color: var(--text); margin-top: 8px; }
+.sheet-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--surface2); border: none;
+  font-size: 14px; cursor: pointer; transition: all .18s;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted); margin-top: 8px;
+}
+.sheet-close:hover { background: var(--border); }
+.sheet-body { padding: 16px 20px 32px; overflow-y: auto; flex: 1; }
+.search-wrap { position: relative; margin-bottom: 16px; }
+.search-input {
+  width: 100%; padding: 13px 16px 13px 44px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 14px;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text);
+  outline: none; transition: border-color .18s;
+}
+.search-input:focus { border-color: var(--accent); }
+.search-icon {
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%); font-size: 18px; pointer-events: none;
+}
+.dict-empty { text-align: center; padding: 32px 20px; color: var(--muted); font-size: 13px; }
+.dict-empty .emoji { font-size: 32px; margin-bottom: 10px; }
+.dict-item {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
+}
+.dict-item-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; }
+.dict-item-es { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; color: var(--text); }
+.dict-item-type {
+  font-size: 10px; font-family: 'Space Mono', monospace;
+  padding: 2px 8px; border-radius: 20px; flex-shrink: 0; margin-left: 8px; margin-top: 3px;
+}
+.type-phrase { background: var(--accent-soft); color: var(--accent); }
+.type-word   { background: var(--accent2-soft); color: var(--accent2); }
+.dict-item-jp { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.dict-item-lessons { display: flex; flex-wrap: wrap; gap: 6px; }
+.lesson-chip {
+  padding: 4px 10px; border-radius: 20px;
+  background: var(--surface); border: 1px solid var(--border);
+  font-size: 11px; font-family: 'Space Mono', monospace; color: var(--accent2);
+  cursor: pointer; transition: all .15s;
+}
+.lesson-chip:hover { background: var(--accent2-soft); border-color: var(--accent2); }
+
+/* Flashcard */
+.flash-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.flash-mode-card {
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: 14px; padding: 16px 14px;
+  cursor: pointer; transition: all .2s; text-align: center;
+}
+.flash-mode-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.flash-mode-card.selected { border-color: var(--accent); background: var(--accent-soft); }
+.flash-mode-icon { font-size: 28px; margin-bottom: 8px; }
+.flash-mode-title { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 3px; }
+.flash-mode-desc  { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+.category-section { margin-bottom: 18px; }
+.section-label {
+  font-size: 11px; font-family: 'Space Mono', monospace;
+  text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 10px;
+}
+.category-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.cat-chip {
+  padding: 7px 14px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--surface);
+  font-size: 12px; font-weight: 500; color: var(--muted);
+  cursor: pointer; transition: all .18s;
+}
+.cat-chip:hover { border-color: var(--accent); color: var(--accent); }
+.cat-chip.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+.cat-chip.all-chip.selected { background: var(--text); border-color: var(--text); }
+
+.flash-settings { display: flex; gap: 10px; margin-bottom: 20px; align-items: flex-end; }
+.setting-group { flex: 1; }
+.setting-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: .06em; }
+.dir-toggle { display: flex; background: var(--surface2); border-radius: 10px; padding: 3px; }
+.dir-btn {
+  flex: 1; padding: 7px 6px; border-radius: 8px;
+  border: none; font-family: 'Space Mono', monospace; font-size: 10px;
+  cursor: pointer; transition: all .18s; background: none; color: var(--muted); text-align: center;
+}
+.dir-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+.count-input {
+  width: 100%; padding: 10px 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  color: var(--text); outline: none; transition: border-color .18s; text-align: center;
+}
+.count-input:focus { border-color: var(--accent); }
+.btn-start {
+  width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none;
+  border-radius: 14px; font-family: 'DM Sans', sans-serif;
+  font-weight: 700; font-size: 15px; cursor: pointer; transition: all .2s;
+  box-shadow: 0 3px 14px rgba(200,96,26,.28);
+}
+.btn-start:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(200,96,26,.35); }
+
+#flash-game { display: none; }
+.flash-progress-wrap { margin-bottom: 20px; }
+.flash-progress-bar { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+.flash-progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .3s ease; }
+.flash-progress-label { display: flex; justify-content: space-between; font-size: 11px; font-family: 'Space Mono', monospace; color: var(--muted); }
+
+.flip-card-wrap { perspective: 1000px; margin-bottom: 20px; cursor: pointer; }
+.flip-card { width: 100%; min-height: 200px; transform-style: preserve-3d; transition: transform .45s ease; position: relative; }
+.flip-card.flipped { transform: rotateY(180deg); }
+.flip-front, .flip-back {
+  position: absolute; width: 100%; min-height: 200px; backface-visibility: hidden;
+  border-radius: 20px; padding: 28px 24px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; box-shadow: var(--shadow);
+}
+.flip-front { background: var(--surface); border: 1px solid var(--border); }
+.flip-back  { background: #2A2420; color: #F7F5F0; transform: rotateY(180deg); border: 1px solid #2A2420; }
+.flip-hint { font-size: 11px; font-family: 'Space Mono', monospace; color: var(--muted); margin-bottom: 14px; text-transform: uppercase; letter-spacing: .06em; }
+.flip-back .flip-hint { color: rgba(247,245,240,.4); }
+.flip-main { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 600; line-height: 1.3; margin-bottom: 8px; }
+.flip-sub { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.flip-back .flip-sub { color: rgba(247,245,240,.6); }
+.flip-tap-hint { font-size: 11px; color: var(--border); margin-top: 16px; font-family: 'Space Mono', monospace; }
+
+.judge-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.judge-btns.hidden { visibility: hidden; }
+.btn-wrong {
+  padding: 14px; border-radius: 14px; border: none;
+  background: var(--red-soft); color: var(--red);
+  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px;
+  cursor: pointer; transition: all .18s; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-correct {
+  padding: 14px; border-radius: 14px; border: none;
+  background: var(--green-soft); color: var(--green);
+  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px;
+  cursor: pointer; transition: all .18s; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-wrong:hover   { background: var(--red);   color: #fff; }
+.btn-correct:hover { background: var(--green); color: #fff; }
+
+#flash-result { display: none; text-align: center; padding: 32px 20px; }
+.result-icon { font-size: 52px; margin-bottom: 16px; }
+.result-title { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.result-stats { display: flex; justify-content: center; gap: 24px; margin: 20px 0 28px; }
+.result-stat { text-align: center; }
+.result-stat-num { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 700; }
+.result-stat-num.green { color: var(--green); }
+.result-stat-num.red   { color: var(--red); }
+.result-stat-label { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.btn-retry {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 28px; border-radius: 14px;
+  background: var(--accent); color: #fff; border: none;
+  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px;
+  cursor: pointer; transition: all .2s; margin-bottom: 12px; width: 100%; justify-content: center;
+}
+.btn-back-setup {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 28px; border-radius: 14px;
+  background: var(--surface); color: var(--muted); border: 1px solid var(--border);
+  font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+  cursor: pointer; transition: all .2s; width: 100%; justify-content: center;
+}
+
+/* toast */
+#toast {
+  position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #1C1814; color: #fff;
+  padding: 10px 20px; border-radius: 20px;
+  font-size: 13px; z-index: 9999;
+  opacity: 0; transition: all .25s;
+  white-space: nowrap; pointer-events: none;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     HOME SCREEN
+══════════════════════════════════ -->
+<div class="screen active" id="screen-home">
+  <div class="top-bar">
+    <div class="top-bar-logo">VOZ.<span>escucha, copia, hazlo tu voz.</span></div>
+    <div class="user-dot">Y</div>
+  </div>
+  <div class="main">
+    <div class="greeting">
+      <div class="greeting-sub">Bienvenida</div>
+      <div class="greeting-name"><span style="color:rgba(247,245,240,.55)">おかえりなさい、</span><em>Yuki</em> 👋</div>
+    </div>
+
+    <div class="streak-banner">
+      <div class="streak-icon">🔥</div>
+      <div class="streak-info">
+        <div class="streak-num">7</div>
+        <div class="streak-label">日連続レッスン中！</div>
+      </div>
+      <div class="streak-days">
+        <div class="streak-day done"><div class="dot"></div><span>月</span></div>
+        <div class="streak-day done"><div class="dot"></div><span>火</span></div>
+        <div class="streak-day done"><div class="dot"></div><span>水</span></div>
+        <div class="streak-day done"><div class="dot"></div><span>木</span></div>
+        <div class="streak-day done"><div class="dot"></div><span>金</span></div>
+        <div class="streak-day done"><div class="dot"></div><span>土</span></div>
+        <div class="streak-day today"><div class="dot"></div><span>日</span></div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-num">12</div><div class="stat-label">完了レッスン数</div></div>
+      <div class="stat-card blue"><div class="stat-icon">📖</div><div class="stat-num">348</div><div class="stat-label">触れた単語数</div></div>
+      <div class="stat-card yellow"><div class="stat-icon">💬</div><div class="stat-num">64</div><div class="stat-label">覚えたフレーズ数</div></div>
+      <div class="stat-card orange"><div class="stat-icon">📅</div><div class="stat-num">23</div><div class="stat-label">累計学習日数</div></div>
+    </div>
+
+    <div class="section-title">途中のレッスン</div>
+    <div class="current-lesson">
+      <div class="current-lesson-label">進行中</div>
+      <div class="current-lesson-name">Bluey Ep3-2</div>
+      <div class="lesson-progress-steps">
+        <div class="lp-step done"></div>
+        <div class="lp-step done"></div>
+        <div class="lp-step done"></div>
+        <div class="lp-step active"></div>
+        <div class="lp-step"></div>
+      </div>
+      <div class="lesson-progress-label">④ Reconstruir まで完了</div>
+      <button class="btn-resume" onclick="showToast('レッスンを再開します...')">▶ 続きから始める</button>
+    </div>
+
+    <div class="section-title">
+      最近のレッスン
+      <a href="#" onclick="switchTab('lessons');return false;">すべて見る</a>
+    </div>
+    <div class="lesson-card" onclick="showToast('Bluey Ep3-1 を開きます')">
+      <div class="lesson-card-icon done">🎬</div>
+      <div class="lesson-card-info"><div class="lesson-card-name">Bluey Ep3-1</div><div class="lesson-card-meta">2日前</div></div>
+      <span class="lesson-card-badge badge-done">完了</span>
+    </div>
+    <div class="lesson-card" onclick="showToast('Bluey Ep2-4 を開きます')">
+      <div class="lesson-card-icon done">🎬</div>
+      <div class="lesson-card-info"><div class="lesson-card-name">Bluey Ep2-4</div><div class="lesson-card-meta">4日前</div></div>
+      <span class="lesson-card-badge badge-done">完了</span>
+    </div>
+    <div class="lesson-card" onclick="showToast('Bluey Ep2-3 を開きます')">
+      <div class="lesson-card-icon done">🎬</div>
+      <div class="lesson-card-info"><div class="lesson-card-name">Bluey Ep2-3</div><div class="lesson-card-meta">1週間前</div></div>
+      <span class="lesson-card-badge badge-done">完了</span>
+    </div>
+    <div class="lesson-card" style="opacity:.6">
+      <div class="lesson-card-icon">🔒</div>
+      <div class="lesson-card-info"><div class="lesson-card-name">Bluey Ep3-3</div><div class="lesson-card-meta">未開始</div></div>
+      <span class="lesson-card-badge badge-new">NEW</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     VOCABULARY SCREEN
+══════════════════════════════════ -->
+<div class="screen" id="screen-vocab">
+  <div class="top-bar">
+    <div class="top-bar-logo compact">VOZ.</div>
+    <div class="top-bar-right">
+      <button class="dict-btn" onclick="openDict()" title="辞書">🔍</button>
+      <div class="user-dot">Y</div>
+    </div>
+  </div>
+  <div class="main">
+    <div id="view-flash">
+      <div id="flash-setup">
+        <div class="section-label" style="margin-bottom:10px">モードを選ぶ</div>
+        <div class="flash-modes">
+          <div class="flash-mode-card selected" id="mode-phrase" onclick="selectMode('phrase')">
+            <div class="flash-mode-icon">💬</div>
+            <div class="flash-mode-title">フレーズ</div>
+            <div class="flash-mode-desc">よく使うフレーズを練習</div>
+          </div>
+          <div class="flash-mode-card" id="mode-word" onclick="selectMode('word')">
+            <div class="flash-mode-icon">📖</div>
+            <div class="flash-mode-title">単語</div>
+            <div class="flash-mode-desc">カテゴリ別の単語を練習</div>
+          </div>
+        </div>
+        <div id="category-section" class="category-section" style="display:none">
+          <div class="section-label">カテゴリを選ぶ</div>
+          <div class="category-chips">
+            <div class="cat-chip all-chip selected" onclick="toggleCat('all',this)">すべて</div>
+            <div class="cat-chip" onclick="toggleCat('furniture',this)">🪑 家具</div>
+            <div class="cat-chip" onclick="toggleCat('food',this)">🍽 料理・食べ物</div>
+            <div class="cat-chip" onclick="toggleCat('travel',this)">✈️ 旅行</div>
+            <div class="cat-chip" onclick="toggleCat('place',this)">📍 場所</div>
+            <div class="cat-chip" onclick="toggleCat('daily',this)">☀️ 日常</div>
+          </div>
+        </div>
+        <div class="flash-settings">
+          <div class="setting-group">
+            <div class="setting-label">出題方向</div>
+            <div class="dir-toggle">
+              <button class="dir-btn active" id="dir-es" onclick="setDir('es')">ES → JP</button>
+              <button class="dir-btn" id="dir-jp" onclick="setDir('jp')">JP → ES</button>
+            </div>
+          </div>
+          <div class="setting-group" style="max-width:90px">
+            <div class="setting-label">枚数</div>
+            <input class="count-input" type="number" id="card-count" value="10" min="1" max="50">
+          </div>
+        </div>
+        <button class="btn-start" onclick="startFlash()">▶ 始める</button>
+      </div>
+
+      <div id="flash-game">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+          <button onclick="backToSetup()" style="padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);cursor:pointer;">✕ 中断する</button>
+        </div>
+        <div class="flash-progress-wrap">
+          <div class="flash-progress-bar"><div class="flash-progress-fill" id="flash-fill" style="width:0%"></div></div>
+          <div class="flash-progress-label">
+            <span id="flash-progress-text">1 / 10</span>
+            <span id="flash-score-text">✅ 0 &nbsp; ❌ 0</span>
+          </div>
+        </div>
+        <div class="flip-card-wrap" onclick="flipCard()">
+          <div class="flip-card" id="flip-card">
+            <div class="flip-front">
+              <div class="flip-hint" id="front-hint">スペイン語</div>
+              <div class="flip-main" id="front-main">—</div>
+              <div class="flip-tap-hint">タップして答えを見る</div>
+            </div>
+            <div class="flip-back">
+              <div class="flip-hint" id="back-hint">日本語</div>
+              <div class="flip-main" id="back-main">—</div>
+              <div class="flip-sub" id="back-sub"></div>
+            </div>
+          </div>
+        </div>
+        <div class="judge-btns hidden" id="judge-btns">
+          <button class="btn-wrong" onclick="judge(false)">❌ もう一度</button>
+          <button class="btn-correct" onclick="judge(true)">✅ わかった！</button>
+        </div>
+      </div>
+
+      <div id="flash-result">
+        <div class="result-icon">🎉</div>
+        <div class="result-title">お疲れさまでした！</div>
+        <div class="result-stats">
+          <div class="result-stat"><div class="result-stat-num green" id="result-correct">0</div><div class="result-stat-label">わかった</div></div>
+          <div class="result-stat"><div class="result-stat-num red" id="result-wrong">0</div><div class="result-stat-label">もう一度</div></div>
+        </div>
+        <button class="btn-retry" onclick="retryWrong()">❌ もう一度だけ復習する</button>
+        <button class="btn-back-setup" onclick="backToSetup()">↩ 最初から</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     LESSONS SCREEN
+══════════════════════════════════ -->
+<div class="screen" id="screen-lessons">
+  <div class="top-bar">
+    <div class="top-bar-logo compact">VOZ.</div>
+    <div class="user-dot">Y</div>
+  </div>
+  <div class="main">
+    <div class="page-header">
+      <div class="page-title">レッスン</div>
+      <div class="page-count" id="count-label">全6件</div>
+    </div>
+    <div class="view-toggle">
+      <button class="view-btn active" id="btn-list" onclick="setView('list')">☰ リスト</button>
+      <button class="view-btn" id="btn-card" onclick="setView('card')">⊞ カード</button>
+    </div>
+    <div class="filter-tabs">
+      <button class="filter-tab active" onclick="setFilter('all', this)"><span class="dot dot-all"></span>すべて</button>
+      <button class="filter-tab" onclick="setFilter('wip', this)"><span class="dot dot-wip"></span>途中のレッスン</button>
+      <button class="filter-tab" onclick="setFilter('done', this)"><span class="dot dot-done"></span>完了済み</button>
+      <button class="filter-tab" onclick="setFilter('new', this)"><span class="dot dot-new"></span>未開始</button>
+    </div>
+    <div id="lessons-container"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     DICT SHEET (shared overlay)
+══════════════════════════════════ -->
+<div class="sheet-overlay" id="sheet-overlay" onclick="closeDict()"></div>
+<div class="dict-sheet" id="dict-sheet">
+  <div class="sheet-handle-wrap">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">🔍 辞書</div>
+    <button class="sheet-close" onclick="closeDict()">✕</button>
+  </div>
+  <div class="sheet-body">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" id="search-input" placeholder="単語・フレーズを検索..." oninput="onSearch()">
+    </div>
+    <div id="dict-results">
+      <div class="dict-empty"><div class="emoji">🔍</div>単語やフレーズを入力してください</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ══════════════════════════════════
+     BOTTOM NAV
+══════════════════════════════════ -->
+<nav class="bottom-nav">
+  <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">ホーム</span>
+  </button>
+  <button class="nav-item" id="nav-vocab" onclick="switchTab('vocab')">
+    <span class="nav-icon">🃏</span>
+    <span class="nav-label">Vocabulary</span>
+  </button>
+  <button class="nav-item" id="nav-lessons" onclick="switchTab('lessons')">
+    <span class="nav-icon">🎬</span>
+    <span class="nav-label">レッスン</span>
+  </button>
+</nav>
+
+<script>
+// ══════════════════════════════════════════
+// NAV SWITCHING
+// ══════════════════════════════════════════
+const tabs = ['home', 'vocab', 'lessons'];
+let currentTab = 'home';
+
+function switchTab(tab) {
+  if (tab === currentTab) return;
+  currentTab = tab;
+  tabs.forEach(t => {
+    document.getElementById('screen-' + t).classList.toggle('active', t === tab);
+    document.getElementById('nav-' + t).classList.toggle('active', t === tab);
+  });
+  window.scrollTo(0, 0);
+}
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ══════════════════════════════════════════
+// VOCABULARY DATA
+// ══════════════════════════════════════════
+const vocab = [
+  { es:'hacer que',    jp:'〜させる・〜するようにする', type:'phrase', lessons:['Bluey Ep3-1','Bluey Ep2-4'] },
+  { es:'se me pase',   jp:'（気分・痛みが）治る・過ぎ去る', type:'phrase', lessons:['Bluey Ep3-1'] },
+  { es:'por un rato',  jp:'少しの間', type:'phrase', lessons:['Bluey Ep3-2','Bluey Ep3-1'] },
+  { es:'a ver',        jp:'ちょっと見せて・さあ', type:'phrase', lessons:['Bluey Ep2-4','Bluey Ep2-3'] },
+  { es:'dale',         jp:'どうぞ・いいよ・やって', type:'phrase', lessons:['Bluey Ep3-2'] },
+  { es:'tener ganas',  jp:'〜したい気持ちがある', type:'phrase', lessons:['Bluey Ep2-3'] },
+  { es:'en serio',     jp:'本当に・マジで', type:'phrase', lessons:['Bluey Ep3-1','Bluey Ep2-3'] },
+  { es:'la silla',     jp:'椅子', type:'word', cat:'furniture', lessons:[] },
+  { es:'la mesa',      jp:'テーブル', type:'word', cat:'furniture', lessons:[] },
+  { es:'el sofá',      jp:'ソファ', type:'word', cat:'furniture', lessons:[] },
+  { es:'la cama',      jp:'ベッド', type:'word', cat:'furniture', lessons:[] },
+  { es:'la comida',    jp:'食べ物・料理', type:'word', cat:'food', lessons:['Bluey Ep2-4'] },
+  { es:'el desayuno',  jp:'朝食', type:'word', cat:'food', lessons:[] },
+  { es:'la cena',      jp:'夕食', type:'word', cat:'food', lessons:[] },
+  { es:'el aeropuerto',jp:'空港', type:'word', cat:'travel', lessons:[] },
+  { es:'el vuelo',     jp:'フライト', type:'word', cat:'travel', lessons:[] },
+  { es:'la maleta',    jp:'スーツケース', type:'word', cat:'travel', lessons:[] },
+  { es:'el parque',    jp:'公園', type:'word', cat:'place', lessons:['Bluey Ep3-2'] },
+  { es:'la tienda',    jp:'お店', type:'word', cat:'place', lessons:[] },
+  { es:'el mercado',   jp:'市場・マーケット', type:'word', cat:'place', lessons:[] },
+];
+
+// ── DICT ──
+function openDict() {
+  document.getElementById('dict-sheet').classList.add('show');
+  document.getElementById('sheet-overlay').classList.add('show');
+  setTimeout(() => document.getElementById('search-input').focus(), 400);
+}
+function closeDict() {
+  document.getElementById('dict-sheet').classList.remove('show');
+  document.getElementById('sheet-overlay').classList.remove('show');
+}
+let searchLang = 'both';
+function onSearch() {
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const container = document.getElementById('dict-results');
+  if (!q) {
+    container.innerHTML = `<div class="dict-empty"><div class="emoji">🔍</div>単語やフレーズを入力してください</div>`;
+    return;
+  }
+  const results = vocab.filter(v => {
+    if (searchLang === 'es') return v.es.toLowerCase().includes(q);
+    if (searchLang === 'jp') return v.jp.toLowerCase().includes(q);
+    return v.es.toLowerCase().includes(q) || v.jp.includes(q);
+  });
+  if (!results.length) {
+    container.innerHTML = `<div class="dict-empty"><div class="emoji">😶</div>「${q}」は見つかりませんでした</div>`;
+    return;
+  }
+  container.innerHTML = results.map(v => `
+    <div class="dict-item">
+      <div class="dict-item-top">
+        <div class="dict-item-es">${v.es}</div>
+        <span class="dict-item-type ${v.type === 'phrase' ? 'type-phrase' : 'type-word'}">${v.type === 'phrase' ? 'フレーズ' : '単語'}</span>
+      </div>
+      <div class="dict-item-jp">${v.jp}</div>
+      ${v.lessons.length ? `<div class="dict-item-lessons">${v.lessons.map(l => `<span class="lesson-chip">📖 ${l}</span>`).join('')}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ── FLASHCARD ──
+let flashMode = 'phrase';
+let flashDir  = 'es';
+let flashCats = ['all'];
+
+function selectMode(mode) {
+  flashMode = mode;
+  document.getElementById('mode-phrase').classList.toggle('selected', mode === 'phrase');
+  document.getElementById('mode-word').classList.toggle('selected', mode === 'word');
+  document.getElementById('category-section').style.display = mode === 'word' ? 'block' : 'none';
+}
+function toggleCat(cat, el) {
+  if (cat === 'all') {
+    flashCats = ['all'];
+    document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    return;
+  }
+  flashCats = flashCats.filter(c => c !== 'all');
+  document.querySelector('.all-chip').classList.remove('selected');
+  if (flashCats.includes(cat)) { flashCats = flashCats.filter(c => c !== cat); el.classList.remove('selected'); }
+  else { flashCats.push(cat); el.classList.add('selected'); }
+  if (!flashCats.length) { flashCats = ['all']; document.querySelector('.all-chip').classList.add('selected'); }
+}
+function setDir(dir) {
+  flashDir = dir;
+  document.getElementById('dir-es').classList.toggle('active', dir === 'es');
+  document.getElementById('dir-jp').classList.toggle('active', dir === 'jp');
+}
+
+let deck = [], deckIdx = 0, correctCount = 0, wrongCount = 0, wrongCards = [], isFlipped = false;
+
+function startFlash() {
+  let pool = vocab.filter(v => {
+    if (flashMode === 'phrase') return v.type === 'phrase';
+    if (flashMode === 'word') {
+      if (flashCats.includes('all')) return v.type === 'word';
+      return v.type === 'word' && flashCats.includes(v.cat);
+    }
+    return true;
+  });
+  pool = pool.sort(() => Math.random() - .5);
+  const count = Math.min(parseInt(document.getElementById('card-count').value) || 10, pool.length);
+  deck = pool.slice(0, count);
+  deckIdx = 0; correctCount = 0; wrongCount = 0; wrongCards = [];
+  document.getElementById('flash-setup').style.display  = 'none';
+  document.getElementById('flash-game').style.display   = 'block';
+  document.getElementById('flash-result').style.display = 'none';
+  showCard();
+}
+function showCard() {
+  if (deckIdx >= deck.length) { showResult(); return; }
+  const card = deck[deckIdx];
+  isFlipped = false;
+  document.getElementById('flip-card').classList.remove('flipped');
+  document.getElementById('judge-btns').classList.add('hidden');
+  const frontText = flashDir === 'es' ? card.es : card.jp;
+  const backText  = flashDir === 'es' ? card.jp : card.es;
+  document.getElementById('front-hint').textContent = flashDir === 'es' ? 'スペイン語' : '日本語';
+  document.getElementById('front-main').textContent = frontText;
+  document.getElementById('back-hint').textContent  = flashDir === 'es' ? '日本語' : 'スペイン語';
+  document.getElementById('back-main').textContent  = backText;
+  document.getElementById('back-sub').textContent   = flashDir === 'es' ? card.es : card.jp;
+  const pct = (deckIdx / deck.length) * 100;
+  document.getElementById('flash-fill').style.width = pct + '%';
+  document.getElementById('flash-progress-text').textContent = `${deckIdx + 1} / ${deck.length}`;
+  document.getElementById('flash-score-text').innerHTML = `✅ ${correctCount} &nbsp; ❌ ${wrongCount}`;
+}
+function flipCard() {
+  if (isFlipped) return;
+  isFlipped = true;
+  document.getElementById('flip-card').classList.add('flipped');
+  setTimeout(() => document.getElementById('judge-btns').classList.remove('hidden'), 300);
+}
+function judge(correct) {
+  if (correct) correctCount++;
+  else { wrongCount++; wrongCards.push(deck[deckIdx]); }
+  deckIdx++;
+  showCard();
+}
+function showResult() {
+  document.getElementById('flash-game').style.display   = 'none';
+  document.getElementById('flash-result').style.display = 'block';
+  document.getElementById('result-correct').textContent = correctCount;
+  document.getElementById('result-wrong').textContent   = wrongCount;
+  document.getElementById('flash-fill').style.width = '100%';
+  document.querySelector('.btn-retry').style.display = wrongCards.length ? 'flex' : 'none';
+}
+function retryWrong() {
+  deck = wrongCards.sort(() => Math.random() - .5);
+  deckIdx = 0; correctCount = 0; wrongCount = 0; wrongCards = [];
+  document.getElementById('flash-result').style.display = 'none';
+  document.getElementById('flash-game').style.display   = 'block';
+  showCard();
+}
+function backToSetup() {
+  document.getElementById('flash-result').style.display = 'none';
+  document.getElementById('flash-game').style.display   = 'none';
+  document.getElementById('flash-setup').style.display  = 'block';
+}
+
+// ══════════════════════════════════════════
+// LESSONS DATA & RENDER
+// ══════════════════════════════════════════
+const lessons = [
+  { id:1, name:'Bluey Ep3-2', date:'2026.04.20', status:'wip',  step:3, emoji:'🎬', reviewCount:0 },
+  { id:2, name:'Bluey Ep3-1', date:'2026.04.15', status:'done', step:5, emoji:'🎬', reviewCount:2 },
+  { id:3, name:'Bluey Ep2-4', date:'2026.04.10', status:'done', step:5, emoji:'🎬', reviewCount:3 },
+  { id:4, name:'Bluey Ep2-3', date:'2026.04.05', status:'done', step:5, emoji:'🎬', reviewCount:1 },
+  { id:5, name:'Bluey Ep3-3', date:'2026.04.22', status:'new',  step:0, emoji:'🎬', reviewCount:0 },
+  { id:6, name:'Bluey Ep3-4', date:'2026.04.22', status:'new',  step:0, emoji:'🎬', reviewCount:0 },
+];
+const ACTION_LABEL = { done: '復習する', wip: '再開する', new: '始める' };
+const STEPS = 5;
+const MAX_STARS = 3;
+let currentView   = 'list';
+let currentFilter = 'all';
+
+function starsHTML(count) {
+  return Array.from({length: MAX_STARS}, (_, i) =>
+    `<span class="star ${i < count ? 'filled' : 'empty'}">⭐</span>`
+  ).join('');
+}
+function onAction(lessonId) {
+  const lesson = lessons.find(l => l.id === lessonId);
+  if (!lesson) return;
+  if (lesson.status === 'done' && lesson.reviewCount < MAX_STARS) {
+    lesson.reviewCount++;
+    renderLessons();
+    showToast(`⭐ ${lesson.name}の復習 ${lesson.reviewCount}回目！`);
+  } else {
+    showToast(`「${lesson.name}」を${ACTION_LABEL[lesson.status]}...`);
+  }
+}
+function setView(v) {
+  currentView = v;
+  document.getElementById('btn-card').classList.toggle('active', v === 'card');
+  document.getElementById('btn-list').classList.toggle('active', v === 'list');
+  renderLessons();
+}
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderLessons();
+}
+function progressDots(step, status, cls) {
+  return Array.from({length: STEPS}, (_, i) => {
+    let c = '';
+    if (status === 'done') c = 'done';
+    else if (i < step) c = 'done';
+    else if (i === step) c = 'active';
+    return `<div class="${cls} ${c}"></div>`;
+  }).join('');
+}
+function stepLabel(step, status) {
+  if (status === 'done') return '全ステップ完了';
+  if (status === 'new')  return '未開始';
+  const names = ['Escuchar','Dictado','Entender','Reconstruir','Imitar'];
+  return `${names[step] || ''} まで完了`;
+}
+function renderLessons() {
+  const filtered = currentFilter === 'all' ? lessons : lessons.filter(l => l.status === currentFilter);
+  document.getElementById('count-label').textContent = `${filtered.length}件`;
+  const container = document.getElementById('lessons-container');
+  if (!filtered.length) {
+    container.innerHTML = `<div class="empty-msg"><div class="emoji">📭</div>該当するレッスンがありません</div>`;
+    return;
+  }
+  if (currentView === 'card') {
+    container.innerHTML = `<div class="card-grid">${filtered.map(l => `
+      <div class="lesson-card-item">
+        <div class="lesson-card-thumb ${l.status}">${l.emoji}<div class="status-pip pip-${l.status}"></div></div>
+        <div class="lesson-card-body">
+          <div class="lesson-card-name">${l.name}</div>
+          ${l.status === 'done' ? `<div class="lesson-stars">${starsHTML(l.reviewCount)}</div>` : ''}
+          <div class="lesson-card-meta">${l.date}</div>
+          <div class="lesson-card-progress">${progressDots(l.step, l.status, 'lcp')}</div>
+          <button class="btn-card-action ${l.status}" onclick="onAction(${l.id})">${ACTION_LABEL[l.status]}</button>
+        </div>
+      </div>`).join('')}</div>`;
+  } else {
+    container.innerHTML = filtered.map(l => `
+      <div class="lesson-list-item">
+        <div class="lesson-list-icon ${l.status}">${l.emoji}</div>
+        <div class="lesson-list-info">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <div class="lesson-list-name" style="margin-bottom:0">${l.name}</div>
+            ${l.status === 'done' ? `<div class="lesson-stars" style="margin-bottom:0">${starsHTML(l.reviewCount)}</div>` : ''}
+          </div>
+          <div class="lesson-list-meta">${stepLabel(l.step, l.status)}</div>
+          <div class="lesson-list-progress">${progressDots(l.step, l.status, 'llp')}</div>
+        </div>
+        <button class="btn-list-action ${l.status}" onclick="onAction(${l.id})">${ACTION_LABEL[l.status]}</button>
+      </div>`).join('');
+  }
+}
+
+renderLessons();
+</script>
+</body>
+</html>
