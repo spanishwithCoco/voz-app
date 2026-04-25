@@ -186,6 +186,7 @@ body {
 .badge-wip  { background:var(--accent-soft); color:var(--accent); }
 .badge-new  { background:var(--surface2); color:var(--muted); }
 .badge-locked { background:var(--surface2); color:var(--muted); }
+.badge-free { background:var(--green-soft); color:var(--green); }
 
 /* ── PLAN BANNER (free) ── */
 .plan-banner {
@@ -531,40 +532,12 @@ body {
       </div>
     </div>
 
-    <div class="section-title">途中のレッスン</div>
-    <div class="current-lesson">
-      <div class="current-lesson-label">進行中</div>
-      <div class="current-lesson-name">Bluey Ep3-2</div>
-      <div class="lesson-progress-steps">
-        <div class="lp-step done"></div>
-        <div class="lp-step done"></div>
-        <div class="lp-step done"></div>
-        <div class="lp-step active"></div>
-        <div class="lp-step"></div>
-      </div>
-      <div class="lesson-progress-label">③ Entender まで完了</div>
-      <button class="btn-resume" onclick="showToast('レッスンを再開します...')">▶ 続きから始める</button>
-    </div>
-
     <div class="section-title">
       最近のレッスン
       <a href="#" onclick="switchTab('lessons');return false;">すべて見る</a>
     </div>
-    <div class="lesson-card" onclick="showToast('Bluey Ep3-1 を開きます')">
-      <div class="lesson-card-icon done">🎬</div>
-      <div class="lesson-card-info"><div class="lesson-card-name">Bluey Ep3-1</div><div class="lesson-card-meta">2日前</div></div>
-      <span class="lesson-card-badge badge-done">完了</span>
-    </div>
-    <div class="lesson-card" onclick="showToast('Bluey Ep2-4 を開きます')">
-      <div class="lesson-card-icon done">🎬</div>
-      <div class="lesson-card-info"><div class="lesson-card-name">Bluey Ep2-4</div><div class="lesson-card-meta">4日前</div></div>
-      <span class="lesson-card-badge badge-done">完了</span>
-    </div>
-    <!-- Freeでロックされるカード -->
-    <div class="lesson-card" id="home-locked-card" onclick="showLockedMsg()">
-      <div class="lesson-card-icon locked">🔒</div>
-      <div class="lesson-card-info"><div class="lesson-card-name">Bluey Ep3-3</div><div class="lesson-card-meta">Pro限定</div></div>
-      <span class="lesson-card-badge badge-locked">🔒 Pro</span>
+    <div id="home-lessons-container">
+      <div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">読み込み中...</div>
     </div>
   </div>
 </div>
@@ -817,19 +790,25 @@ let sbFlashcards = [];
 let sbDict = {};
 
 async function loadFromSupabase() {
+  // ローディング状態を表示
+  const homeLessons = document.getElementById('home-lessons-container');
+  if (homeLessons) homeLessons.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">読み込み中...</div>';
+  const lessonsContainer = document.getElementById('lessons-container');
+  if (lessonsContainer) lessonsContainer.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">読み込み中...</div>';
+
   const [lessonsRaw, fcRaw, dictRaw] = await Promise.all([
     sbGet('lessons', 'order=date.desc'),
     sbGet('flashcards', 'order=created.desc'),
     sbGet('dict'),
   ]);
 
-  // visibility でフィルタリング
-  // public → 全員
-  // members → proのみ
-  // private → 非表示
+  // visibility に応じてフィルタリング
+  // public  → 全員に表示
+  // members → Proのみ表示（Free には locked として表示）
+  // private → 完全に非表示
   sbLessons = lessonsRaw
     .filter(l => l.visibility !== 'private')
-    .map((l, i) => ({
+    .map(l => ({
       id: l.id,
       name: l.name,
       url: l.url || '',
@@ -841,6 +820,7 @@ async function loadFromSupabase() {
       reviewCount: 0
     }));
 
+  // private 以外 → 表示対象（Free には members が locked）
   sbFlashcards = fcRaw.filter(f => f.visibility !== 'private');
 
   sbDict = {};
@@ -848,9 +828,8 @@ async function loadFromSupabase() {
     sbDict[d.es] = { ...d };
   });
 
+  renderHomeLessons();
   renderLessons();
-  renderVocab();
-  renderDictResults(''); // 辞書の初期化
 }
 
 function setPlan(plan) {
@@ -878,6 +857,7 @@ function applyPlanUI() {
   document.getElementById('plan-already-pro').style.display = isFree ? 'none' : 'block';
   document.getElementById('plan-upgrade-btn-wrap').style.display = isFree ? 'block' : 'none';
   renderLessons();
+  renderHomeLessons();
   document.getElementById('dev-free').classList.toggle('active', isFree);
   document.getElementById('dev-pro').classList.toggle('active', !isFree);
 }
@@ -943,8 +923,55 @@ function buildVocabPool() {
   }));
 }
 
-function renderVocab() {
-  // 必要に応じて vocab 画面を再描画
+// ホーム画面のレッスン一覧（最新5件）
+function renderHomeLessons() {
+  const container = document.getElementById('home-lessons-container');
+  if (!container) return;
+
+  // 表示対象：private以外（ただしmembersはFreeにはlockedとして表示）
+  const lessons = sbLessons.slice(0, 5); // 最新5件
+
+  if (!lessons.length) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">レッスンがまだありません</div>';
+    return;
+  }
+
+  container.innerHTML = lessons.map(l => {
+    const locked = isLocked(l);
+    if (locked) {
+      return `<div class="lesson-card" onclick="showLockedMsg()">
+        <div class="lesson-card-icon locked">🔒</div>
+        <div class="lesson-card-info">
+          <div class="lesson-card-name">${escapeHtml(l.name)}</div>
+          <div class="lesson-card-meta">Pro限定</div>
+        </div>
+        <span class="lesson-card-badge badge-locked">🔒 Pro</span>
+      </div>`;
+    }
+    const badge = l.visibility === 'public'
+      ? '<span class="lesson-card-badge badge-free">無料</span>'
+      : '<span class="lesson-card-badge badge-done">受講可</span>';
+    return `<div class="lesson-card" onclick="openLesson('${l.id}')">
+      <div class="lesson-card-icon new">🎬</div>
+      <div class="lesson-card-info">
+        <div class="lesson-card-name">${escapeHtml(l.name)}</div>
+        <div class="lesson-card-meta">${l.date || ''}</div>
+      </div>
+      ${badge}
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function openLesson(id) {
+  const lesson = sbLessons.find(l => l.id === id);
+  if (!lesson) return;
+  if (isLocked(lesson)) { showToast('🔒 このレッスンはProプラン限定です'); switchTab('plan'); return; }
+  if (lesson.url) { window.open(lesson.url, '_blank'); return; }
+  showToast('URLが設定されていません');
 }
 
 // ── DICT ──
@@ -1095,11 +1122,7 @@ function starsHTML(count) {
   return Array.from({length:MAX_STARS},(_,i)=>`<span class="star ${i<count?'filled':'empty'}">⭐</span>`).join('');
 }
 function onAction(lessonId) {
-  const lesson = sbLessons.find(l=>l.id===lessonId);
-  if (!lesson) return;
-  if (isLocked(lesson)) { showToast('🔒 このレッスンはProプラン限定です'); switchTab('plan'); return; }
-  if (lesson.url) { window.open(lesson.url, '_blank'); return; }
-  showToast(`「${lesson.name}」を開けませんでした`);
+  openLesson(lessonId);
 }
 function setView(v) {
   currentView=v;
