@@ -4,16 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VOZ</title>
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
-<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <meta name="application-name" content="VOZ">
 <meta name="apple-mobile-web-app-title" content="VOZ">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#7B3A3A">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,700;1,300;1,600&family=DM+Sans:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -457,123 +453,6 @@ body {
 .btn-upgrade-full:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(200,96,26,.4); }
 .upgrade-note { font-size: 11px; color: var(--muted); text-align: center; font-family: 'Space Mono', monospace; }
 
-/* ── PROFILE MENU ── */
-.profile-menu-overlay {
-  display: none; position: fixed; inset: 0; z-index: 150;
-}
-.profile-menu-overlay.show { display: block; }
-.profile-menu {
-  position: fixed; top: 58px; right: 16px; z-index: 151;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 16px; box-shadow: var(--shadow-lg);
-  min-width: 220px; overflow: hidden;
-  transform: scale(.95) translateY(-6px); opacity: 0;
-  transition: transform .2s cubic-bezier(.32,.72,0,1), opacity .2s;
-  pointer-events: none;
-}
-.profile-menu.show {
-  transform: scale(1) translateY(0); opacity: 1;
-  pointer-events: auto;
-}
-.profile-menu-header {
-  padding: 16px 18px 12px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface2);
-}
-.profile-menu-avatar {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: var(--accent); color: #fff;
-  font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600;
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 8px;
-}
-.profile-menu-name {
-  font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 2px;
-}
-.profile-menu-email {
-  font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace;
-}
-.profile-menu-plan {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 10px; font-weight: 700; font-family: 'Space Mono', monospace;
-  text-transform: uppercase; letter-spacing: .06em;
-  padding: 2px 8px; border-radius: 20px; margin-top: 6px;
-}
-.profile-menu-plan.free { background: var(--surface2); color: var(--muted); }
-.profile-menu-plan.pro { background: var(--accent); color: #fff; }
-.profile-menu-items { padding: 8px 0; }
-.profile-menu-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 18px; cursor: pointer;
-  transition: background .15s; border: none; background: none;
-  width: 100%; text-align: left; color: var(--text);
-  font-family: 'DM Sans', sans-serif; font-size: 14px;
-}
-.profile-menu-item:hover { background: var(--surface2); }
-.profile-menu-item.danger { color: var(--red); }
-.profile-menu-item .item-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
-.profile-menu-divider { height: 1px; background: var(--border); margin: 4px 0; }
-
-/* ── ACCOUNT SHEET ── */
-.account-sheet {
-  position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface);
-  border-radius: 20px 20px 0 0; z-index: 202; transform: translateY(100%);
-  transition: transform .3s cubic-bezier(.32,.72,0,1); max-height: 85vh;
-  display: flex; flex-direction: column; box-shadow: 0 -4px 40px rgba(0,0,0,.15);
-}
-.account-sheet.show { transform: translateY(0); }
-.account-sheet-header {
-  padding: 16px 20px; display: flex; align-items: center;
-  border-bottom: 1px solid var(--border);
-}
-.account-sheet-title {
-  font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; flex: 1;
-}
-.account-sheet-close {
-  background: none; border: none; font-size: 20px; cursor: pointer;
-  color: var(--muted); padding: 4px; border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  width: 32px; height: 32px; transition: background .15s;
-}
-.account-sheet-close:hover { background: var(--surface2); }
-.account-sheet-body { padding: 20px; overflow-y: auto; flex: 1; }
-.form-group { margin-bottom: 18px; }
-.form-label {
-  font-size: 11px; font-family: 'Space Mono', monospace; text-transform: uppercase;
-  letter-spacing: .07em; color: var(--muted); margin-bottom: 7px; display: block;
-}
-.form-input {
-  width: 100%; padding: 12px 14px; background: var(--surface2);
-  border: 1px solid var(--border); border-radius: 12px;
-  font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text);
-  outline: none; transition: border-color .18s;
-}
-.form-input:focus { border-color: var(--accent); background: var(--surface); }
-.btn-save {
-  width: 100%; padding: 13px; background: var(--accent); color: #fff;
-  border: none; border-radius: 12px;
-  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px;
-  cursor: pointer; transition: all .2s; margin-bottom: 12px;
-  box-shadow: 0 3px 14px rgba(200,96,26,.28);
-}
-.btn-save:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(200,96,26,.35); }
-.btn-danger-outline {
-  width: 100%; padding: 12px; background: none;
-  border: 1.5px solid var(--red-soft); color: var(--red);
-  border-radius: 12px; font-family: 'DM Sans', sans-serif;
-  font-weight: 600; font-size: 14px; cursor: pointer;
-  transition: all .2s;
-}
-.btn-danger-outline:hover { background: var(--red-soft); }
-.danger-section {
-  margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border);
-}
-.danger-section-label {
-  font-size: 11px; font-family: 'Space Mono', monospace;
-  text-transform: uppercase; letter-spacing: .07em;
-  color: var(--red); margin-bottom: 8px; display: block; opacity: .7;
-}
-
 /* ── TOAST ── */
 #toast {
   position:fixed; bottom:calc(var(--nav-h) + 16px); left:50%;
@@ -610,7 +489,7 @@ body {
 <div class="screen active" id="screen-home">
   <div class="top-bar">
     <div class="top-bar-logo">VOZ.<span>escucha, copia, hazlo tu voz.</span></div>
-    <div class="user-dot" onclick="toggleProfileMenu(event)">Y</div>
+    <div class="user-dot" onclick="switchTab('plan')" title="プランを見る">Y</div>
   </div>
   <div class="main">
     <div class="greeting">
@@ -618,18 +497,7 @@ body {
       <div class="greeting-name"><span style="color:rgba(247,245,240,.55)">おかえりなさい、</span><em>Yuki</em> 👋</div>
     </div>
 
-    <!-- フリープランバナー（Proでは非表示） -->
-    <div class="plan-banner" id="free-home-banner">
-      <div class="plan-badge">✦ Free プラン</div>
-      <div class="plan-title">Proにアップグレードしよう</div>
-      <div class="plan-desc">すべてのレッスン・単語帳・復習機能が使えるようになります。</div>
-      <div class="plan-features">
-        <div class="plan-feature"><span class="check">✦</span> レッスン無制限（現在3件まで）</div>
-        <div class="plan-feature"><span class="check">✦</span> フラッシュカード全カテゴリ解放</div>
-        <div class="plan-feature"><span class="check">✦</span> 学習記録・ストリーク全機能</div>
-      </div>
-      <button class="btn-upgrade" onclick="switchTab('plan')">✦ Proプランを見る</button>
-    </div>
+
 
     <div class="streak-banner">
       <div class="streak-icon">🔥</div>
@@ -669,7 +537,7 @@ body {
     <div class="top-bar-logo compact">VOZ.</div>
     <div class="top-bar-right">
       <button class="dict-btn" onclick="openDict()">🔍 辞書</button>
-      <div class="user-dot" onclick="toggleProfileMenu(event)">Y</div>
+      <div class="user-dot" onclick="switchTab('plan')">Y</div>
     </div>
   </div>
   <div class="main">
@@ -768,7 +636,7 @@ body {
 <div class="screen" id="screen-lessons">
   <div class="top-bar">
     <div class="top-bar-logo compact">VOZ.</div>
-    <div class="user-dot" onclick="toggleProfileMenu(event)">Y</div>
+    <div class="user-dot" onclick="switchTab('plan')">Y</div>
   </div>
   <div class="main">
     <div class="page-header">
@@ -793,9 +661,22 @@ body {
 <div class="screen" id="screen-plan">
   <div class="top-bar">
     <div class="top-bar-logo compact">VOZ.</div>
-    <div class="user-dot" onclick="toggleProfileMenu(event)">Y</div>
+    <div class="user-dot">Y</div>
   </div>
   <div class="main">
+    <!-- フリープランバナー（Proでは非表示） -->
+    <div class="plan-banner" id="free-home-banner">
+      <div class="plan-badge">✦ Free プラン</div>
+      <div class="plan-title">Proにアップグレードしよう</div>
+      <div class="plan-desc">すべてのレッスン・単語帳・復習機能が使えるようになります。</div>
+      <div class="plan-features">
+        <div class="plan-feature"><span class="check">✦</span> レッスン無制限（現在3件まで）</div>
+        <div class="plan-feature"><span class="check">✦</span> フラッシュカード全カテゴリ解放</div>
+        <div class="plan-feature"><span class="check">✦</span> 学習記録・ストリーク全機能</div>
+      </div>
+      <button class="btn-upgrade" onclick="showToast('決済機能は準備中です')">✦ Proプランを見る</button>
+    </div>
+
     <div class="upgrade-hero">
       <div class="upgrade-star">✦</div>
       <div class="upgrade-title">VOZ Pro</div>
@@ -840,58 +721,6 @@ body {
     <div id="plan-upgrade-btn-wrap">
       <button class="btn-upgrade-full" onclick="showToast('決済機能は準備中です')">✦ Proにアップグレード</button>
       <div class="upgrade-note">※ 価格・決済方法は近日公開予定</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ PROFILE MENU ══════════════ -->
-<div class="profile-menu-overlay" id="profile-menu-overlay" onclick="closeProfileMenu()"></div>
-<div class="profile-menu" id="profile-menu">
-  <div class="profile-menu-header">
-    <div class="profile-menu-avatar">Y</div>
-    <div class="profile-menu-name">Yuki</div>
-    <div class="profile-menu-email">yuki@example.com</div>
-    <div class="profile-menu-plan free" id="profile-plan-badge">Free プラン</div>
-  </div>
-  <div class="profile-menu-items">
-    <button class="profile-menu-item" onclick="openAccountSheet(); closeProfileMenu()">
-      <span class="item-icon">👤</span>アカウント編集
-    </button>
-    <button class="profile-menu-item" onclick="switchTab('plan'); closeProfileMenu()">
-      <span class="item-icon">✦</span>プラン詳細
-    </button>
-    <div class="profile-menu-divider"></div>
-    <button class="profile-menu-item danger" onclick="handleLogout(); closeProfileMenu()">
-      <span class="item-icon">🚪</span>ログアウト
-    </button>
-  </div>
-</div>
-
-<!-- ══════════════ ACCOUNT SHEET ══════════════ -->
-<div class="sheet-overlay" id="account-overlay" onclick="closeAccountSheet()"></div>
-<div class="account-sheet" id="account-sheet">
-  <div class="account-sheet-header">
-    <div class="account-sheet-title">👤 アカウント編集</div>
-    <button class="account-sheet-close" onclick="closeAccountSheet()">✕</button>
-  </div>
-  <div class="account-sheet-body">
-    <div class="form-group">
-      <label class="form-label">ユーザー名</label>
-      <input class="form-input" type="text" id="account-name" value="Yuki" placeholder="ユーザー名">
-    </div>
-    <div class="form-group">
-      <label class="form-label">メールアドレス</label>
-      <input class="form-input" type="email" id="account-email" value="yuki@example.com" placeholder="メールアドレス">
-    </div>
-    <div class="form-group">
-      <label class="form-label">新しいパスワード（変更する場合）</label>
-      <input class="form-input" type="password" id="account-password" placeholder="新しいパスワード">
-    </div>
-    <button class="btn-save" onclick="saveAccount()">変更を保存</button>
-
-    <div class="danger-section">
-      <span class="danger-section-label">危険ゾーン</span>
-      <button class="btn-danger-outline" onclick="confirmDeleteAccount()">アカウントを削除する</button>
     </div>
   </div>
 </div>
@@ -1029,6 +858,9 @@ function applyPlanUI() {
   if (!isFree) document.getElementById('category-section').classList.remove('locked');
   document.getElementById('plan-already-pro').style.display = isFree ? 'none' : 'block';
   document.getElementById('plan-upgrade-btn-wrap').style.display = isFree ? 'block' : 'none';
+  // Proのときはボトムナビの「プラン」タブを非表示
+  const navPlan = document.getElementById('nav-plan');
+  if (navPlan) navPlan.style.display = isFree ? 'flex' : 'none';
   renderLessons();
   renderHomeLessons();
   document.getElementById('dev-free').classList.toggle('active', isFree);
@@ -1370,69 +1202,6 @@ function renderLessons() {
       </div>`;
     }).join('');
   }
-}
-
-// ══════════════════════════════════════════
-// PROFILE MENU
-// ══════════════════════════════════════════
-function toggleProfileMenu(e) {
-  e.stopPropagation();
-  const menu = document.getElementById('profile-menu');
-  const overlay = document.getElementById('profile-menu-overlay');
-  const isOpen = menu.classList.contains('show');
-  if (isOpen) {
-    closeProfileMenu();
-  } else {
-    menu.classList.add('show');
-    overlay.classList.add('show');
-    updateProfilePlanBadge();
-  }
-}
-function closeProfileMenu() {
-  document.getElementById('profile-menu').classList.remove('show');
-  document.getElementById('profile-menu-overlay').classList.remove('show');
-}
-function updateProfilePlanBadge() {
-  const badge = document.getElementById('profile-plan-badge');
-  if (!badge) return;
-  if (currentPlan === 'pro') {
-    badge.textContent = '✦ Pro プラン';
-    badge.className = 'profile-menu-plan pro';
-  } else {
-    badge.textContent = 'Free プラン';
-    badge.className = 'profile-menu-plan free';
-  }
-}
-
-// ── ACCOUNT SHEET ──
-function openAccountSheet() {
-  document.getElementById('account-sheet').classList.add('show');
-  document.getElementById('account-overlay').classList.add('show');
-}
-function closeAccountSheet() {
-  document.getElementById('account-sheet').classList.remove('show');
-  document.getElementById('account-overlay').classList.remove('show');
-}
-function saveAccount() {
-  const name = document.getElementById('account-name').value.trim();
-  const email = document.getElementById('account-email').value.trim();
-  if (!name || !email) { showToast('名前とメールアドレスを入力してください'); return; }
-  // UI更新（実際の保存はSupabase連携後に実装）
-  document.querySelectorAll('.user-dot').forEach(el => el.textContent = name.charAt(0).toUpperCase());
-  document.querySelector('.profile-menu-name').textContent = name;
-  document.querySelector('.profile-menu-email').textContent = email;
-  document.querySelector('.profile-menu-avatar').textContent = name.charAt(0).toUpperCase();
-  closeAccountSheet();
-  showToast('✅ アカウント情報を更新しました');
-}
-function confirmDeleteAccount() {
-  if (confirm('本当にアカウントを削除しますか？\nこの操作は取り消せません。')) {
-    showToast('⚠️ アカウント削除機能は近日公開予定です');
-    closeAccountSheet();
-  }
-}
-function handleLogout() {
-  showToast('ログアウト機能は近日公開予定です');
 }
 
 // ══════════════════════════════════════════
