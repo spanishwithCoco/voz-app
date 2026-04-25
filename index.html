@@ -4,9 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VOZ</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="application-name" content="VOZ">
+<meta name="apple-mobile-web-app-title" content="VOZ">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,700;1,300;1,600&family=DM+Sans:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   --bg: #F7F5F0;
@@ -22,9 +26,11 @@
   --green: #2A7A50;
   --green-soft: rgba(42,122,80,0.10);
   --yellow: #E8A820;
+  --yellow-soft: rgba(232,168,32,0.12);
   --red: #C0392B;
   --red-soft: rgba(192,57,43,0.10);
   --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.11);
   --nav-h: 68px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,462 +39,718 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  padding-bottom: var(--nav-h);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-/* ── LOADING ── */
-#loading-screen {
-  position: fixed; inset: 0; background: var(--bg);
-  display: flex; align-items: center; justify-content: center; z-index: 999;
-}
-.loading-logo {
-  font-family: 'Fraunces', serif; font-size: 48px; font-weight: 700;
-  color: var(--accent); animation: pulse 1.2s ease infinite;
-}
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
-
-/* ── AUTH ── */
-#auth-wrapper {
-  display: none; min-height: 100vh;
-  flex-direction: column; align-items: center; justify-content: center;
-  padding: 24px 20px;
-}
-.auth-logo { font-family: 'Fraunces', serif; font-size: 44px; font-weight: 700; color: var(--accent); letter-spacing: -1px; text-align: center; margin-bottom: 4px; }
-.auth-tagline { font-size: 13px; color: var(--muted); text-align: center; font-style: italic; margin-bottom: 36px; }
-.auth-card { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 32px 28px; box-shadow: 0 8px 40px rgba(0,0,0,0.09); }
-.auth-card-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
-.auth-card-sub { font-size: 13px; color: var(--muted); margin-bottom: 26px; line-height: 1.5; }
-.auth-field { margin-bottom: 14px; }
-.auth-label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 6px; font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: .05em; }
-.auth-input { width: 100%; padding: 13px 16px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); outline: none; transition: border-color .18s, background .18s; }
-.auth-input:focus { border-color: var(--accent); background: #fff; }
-.auth-input::placeholder { color: #ccc; }
-.auth-msg { border-radius: 10px; padding: 10px 14px; font-size: 13px; margin-bottom: 14px; display: none; }
-.auth-msg.show { display: block; }
-.auth-msg.error { background: var(--red-soft); border: 1px solid rgba(192,57,43,.2); color: var(--red); }
-.auth-msg.success { background: var(--green-soft); border: 1px solid rgba(42,122,80,.2); color: var(--green); }
-.btn-auth {
-  width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none;
-  border-radius: 12px; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px;
-  cursor: pointer; transition: all .2s; box-shadow: 0 3px 14px rgba(200,96,26,.28);
-  margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.btn-auth:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(200,96,26,.35); }
-.btn-auth:disabled { opacity: .6; transform: none; cursor: not-allowed; }
-.spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; display: none; }
-.btn-auth.loading .spinner { display: block; }
-.btn-auth.loading .btn-label { display: none; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.auth-switch { text-align: center; margin-top: 22px; font-size: 13px; color: var(--muted); }
-.auth-switch a { color: var(--accent); font-weight: 600; cursor: pointer; text-decoration: none; }
-.auth-switch a:hover { text-decoration: underline; }
-
-/* ── APP ── */
-#app-wrapper { display: none; padding-bottom: var(--nav-h); }
+/* ── SCREENS ── */
 .screen { display: none; min-height: calc(100vh - var(--nav-h)); animation: fadeUp .3s ease both; }
 .screen.active { display: block; }
-@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-.top-bar { position: sticky; top: 0; z-index: 50; background: rgba(247,245,240,0.92); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
-.top-bar-logo { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; }
-.top-bar-logo span { font-style: italic; font-weight: 300; font-size: 13px; color: var(--muted); margin-left: 8px; font-family: 'DM Sans', sans-serif; }
-.top-bar-logo.compact span { display: none; }
-.top-bar-right { display: flex; align-items: center; gap: 10px; }
-.user-dot { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: #fff; font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
-.btn-logout { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--muted); cursor: pointer; transition: all .18s; }
-.btn-logout:hover { border-color: var(--red); color: var(--red); }
+/* ── TOP BAR ── */
+.top-bar {
+  position: sticky; top:0; z-index:50;
+  background: rgba(247,245,240,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.top-bar-logo { font-family: 'Fraunces', serif; font-size: 22px; font-weight:700; color: var(--accent); letter-spacing: -0.5px; }
+.top-bar-logo span { font-style:italic; font-weight:300; font-size:13px; color:var(--muted); margin-left:8px; font-family:'DM Sans',sans-serif; }
+.top-bar-logo.compact span { display:none; }
+.top-bar-right { display:flex; align-items:center; gap:10px; }
+.user-dot {
+  width:32px; height:32px; border-radius:50%;
+  background: var(--accent); color:#fff;
+  font-family:'Fraunces',serif; font-size:14px; font-weight:600;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+}
+.icon-btn {
+  background:none; border:none; font-size:20px; cursor:pointer;
+  padding:4px; border-radius:8px; transition: background .15s;
+}
+.icon-btn:hover { background: var(--surface2); }
 
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-h); background: rgba(247,245,240,0.96); backdrop-filter: blur(16px); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; z-index: 100; }
-.nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 20px; border-radius: 14px; cursor: pointer; transition: all .18s; border: none; background: none; color: var(--muted); min-width: 70px; }
-.nav-item.active { background: var(--accent-soft); color: var(--accent); }
-.nav-item:hover:not(.active) { background: var(--surface2); }
-.nav-icon { font-size: 22px; line-height: 1; }
-.nav-label { font-size: 10px; font-weight: 600; letter-spacing: .03em; }
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position:fixed; bottom:0; left:0; right:0; height:var(--nav-h);
+  background:rgba(247,245,240,0.96); backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-around;
+  padding:0 8px; z-index:100;
+}
+.nav-item {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:8px 20px; border-radius:14px;
+  cursor:pointer; transition:all .18s;
+  border:none; background:none; color:var(--muted); min-width:70px;
+}
+.nav-item.active { background:var(--accent-soft); color:var(--accent); }
+.nav-item:hover:not(.active) { background:var(--surface2); }
+.nav-icon { font-size:22px; line-height:1; }
+.nav-label { font-size:10px; font-weight:600; letter-spacing:.03em; }
 
-.main { max-width: 480px; margin: 0 auto; padding: 20px 18px 32px; }
-.section-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-.section-title a { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400; color: var(--accent); text-decoration: none; }
+/* ── SHARED ── */
+.main { max-width:480px; margin:0 auto; padding:20px 18px 32px; }
+.section-title {
+  font-family:'Fraunces',serif; font-size:17px; font-weight:600; color:var(--text);
+  margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;
+}
+.section-title a { font-family:'DM Sans',sans-serif; font-size:12px; font-weight:400; color:var(--accent); text-decoration:none; }
 
-/* HOME */
-.greeting { margin-bottom: 20px; background: #2A2420; border-radius: 16px; padding: 18px 20px; }
-.greeting-sub { font-size: 12px; color: rgba(255,255,255,.45); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
-.greeting-name { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 600; color: #F7F5F0; line-height: 1.2; }
-.greeting-name em { color: var(--accent); font-style: italic; }
-.streak-banner { background: linear-gradient(135deg, var(--accent) 0%, #E07820 100%); border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(200,96,26,.25); }
-.streak-icon { font-size: 36px; flex-shrink: 0; }
-.streak-info { flex: 1; }
-.streak-num { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 700; color: #fff; line-height: 1; }
-.streak-label { font-size: 12px; color: rgba(255,255,255,.75); margin-top: 2px; }
-.streak-days { display: flex; gap: 5px; }
-.streak-day { width: 28px; height: 28px; border-radius: 8px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: 9px; font-family: 'Space Mono', monospace; color: rgba(255,255,255,.7); flex-direction: column; gap: 2px; }
-.streak-day.done { background: rgba(255,255,255,.35); color: #fff; }
-.streak-day.today { background: #fff; color: var(--accent); font-weight: 700; }
-.streak-day .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px 18px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
-.stat-card::before { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 60px; border-radius: 50%; opacity: .07; transform: translate(20px,-20px); }
-.stat-card.green::before{background:var(--green)} .stat-card.blue::before{background:var(--accent2)} .stat-card.yellow::before{background:var(--yellow)} .stat-card.orange::before{background:var(--accent)}
-.stat-icon { font-size: 20px; margin-bottom: 8px; }
-.stat-num { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 700; line-height: 1; }
-.stat-label { font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 500; }
-.current-lesson { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 20px; box-shadow: var(--shadow); }
-.current-lesson-label { font-size: 10px; font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-bottom: 6px; }
-.current-lesson-name { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; margin-bottom: 12px; }
-.lesson-progress-steps { display: flex; gap: 5px; margin-bottom: 6px; }
-.lp-step { flex: 1; height: 6px; border-radius: 3px; background: var(--surface2); }
-.lp-step.done{background:var(--green)} .lp-step.active{background:var(--accent)}
-.lesson-progress-label { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
-.btn-resume { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: all .2s; box-shadow: 0 3px 12px rgba(200,96,26,.3); }
-.lesson-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow); cursor: pointer; transition: all .18s; }
-.lesson-card:hover { border-color: var(--accent); transform: translateY(-1px); }
-.lesson-card-icon { width: 42px; height: 42px; border-radius: 12px; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-.lesson-card-icon.done{background:var(--green-soft)}
-.lesson-card-info { flex: 1; min-width: 0; }
-.lesson-card-name { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lesson-card-meta { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: 'Space Mono', monospace; }
-.lesson-card-badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
-.badge-done{background:var(--green-soft);color:var(--green)} .badge-new{background:var(--surface2);color:var(--muted)}
+/* ── HOME ── */
+.greeting { margin-bottom:20px; background:#2A2420; border-radius:16px; padding:18px 20px; }
+.greeting-sub { font-size:12px; color:rgba(255,255,255,.45); font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px; }
+.greeting-name { font-family:'Fraunces',serif; font-size:22px; font-weight:600; color:#F7F5F0; line-height:1.2; }
+.greeting-name em { color:var(--accent); font-style:italic; }
 
-/* LESSONS */
-.page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 18px; }
-.page-title { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700; }
-.page-count { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; }
-.view-toggle { display: flex; gap: 6px; margin-bottom: 14px; }
-.view-btn { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all .18s; }
-.view-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.filter-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 18px; scrollbar-width: none; }
-.filter-tabs::-webkit-scrollbar{display:none}
-.filter-tab { padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all .18s; }
-.filter-tab.active{background:var(--text);color:#fff;border-color:var(--text)}
-.filter-tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle}
-.dot-all{background:var(--muted)}.dot-done{background:var(--green)}.dot-wip{background:var(--accent)}.dot-new{background:var(--accent2)}
-.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.lesson-card-item{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:all .2s}
-.lesson-card-item:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.1)}
-.lesson-card-thumb{height:88px;display:flex;align-items:center;justify-content:center;font-size:36px;position:relative}
-.lesson-card-thumb.done{background:var(--green-soft)}.lesson-card-thumb.wip{background:var(--accent-soft)}.lesson-card-thumb.new{background:var(--accent2-soft)}
-.status-pip{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%}
-.pip-done{background:var(--green)}.pip-wip{background:var(--accent)}.pip-new{background:var(--accent2)}
-.lesson-card-body{padding:12px 12px 14px}
-.lesson-card-name{font-weight:600;font-size:13px;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lesson-card-meta{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:10px}
-.lesson-card-progress{display:flex;gap:3px;margin-bottom:10px}
-.lcp{flex:1;height:4px;border-radius:2px;background:var(--surface2)}.lcp.done{background:var(--green)}.lcp.active{background:var(--accent)}
-.btn-card-action{width:100%;padding:8px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer}
-.btn-card-action.done{background:var(--green-soft);color:var(--green)}.btn-card-action.wip{background:var(--accent-soft);color:var(--accent)}.btn-card-action.new{background:var(--accent2-soft);color:var(--accent2)}
-.lesson-stars{display:flex;gap:3px;align-items:center;margin-bottom:5px}
-.star{font-size:13px;line-height:1}.star.empty{filter:grayscale(1);opacity:.3}
-.lesson-list-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);cursor:pointer;transition:all .18s}
-.lesson-list-item:hover{border-color:var(--accent);transform:translateY(-1px)}
-.lesson-list-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.lesson-list-icon.done{background:var(--green-soft)}.lesson-list-icon.wip{background:var(--accent-soft)}.lesson-list-icon.new{background:var(--accent2-soft)}
-.lesson-list-info{flex:1;min-width:0}
-.lesson-list-name{font-weight:600;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
-.lesson-list-meta{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:6px}
-.lesson-list-progress{display:flex;gap:3px}
-.llp{flex:1;height:3px;border-radius:2px;background:var(--surface2)}.llp.done{background:var(--green)}.llp.active{background:var(--accent)}
-.btn-list-action{padding:8px 14px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
-.btn-list-action.done{background:var(--green-soft);color:var(--green)}.btn-list-action.wip{background:var(--accent);color:#fff}.btn-list-action.new{background:var(--accent2-soft);color:var(--accent2)}
-.empty-msg{text-align:center;padding:48px 20px;color:var(--muted);font-size:14px}
-.empty-msg .emoji{font-size:36px;margin-bottom:12px}
+.streak-banner {
+  background:linear-gradient(135deg, var(--accent) 0%, #E07820 100%);
+  border-radius:16px; padding:18px 20px;
+  display:flex; align-items:center; gap:16px; margin-bottom:20px;
+  box-shadow:0 4px 20px rgba(200,96,26,.25);
+}
+.streak-icon { font-size:36px; flex-shrink:0; filter:drop-shadow(0 2px 6px rgba(0,0,0,.2)); }
+.streak-info { flex:1; }
+.streak-num { font-family:'Fraunces',serif; font-size:32px; font-weight:700; color:#fff; line-height:1; }
+.streak-label { font-size:12px; color:rgba(255,255,255,.75); margin-top:2px; }
+.streak-days { display:flex; gap:5px; }
+.streak-day {
+  width:28px; height:28px; border-radius:8px; background:rgba(255,255,255,.2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; font-family:'Space Mono',monospace;
+  color:rgba(255,255,255,.7); flex-direction:column; gap:2px;
+}
+.streak-day.done { background:rgba(255,255,255,.35); color:#fff; }
+.streak-day.today { background:#fff; color:var(--accent); font-weight:700; }
+.streak-day .dot { width:5px; height:5px; border-radius:50%; background:currentColor; }
 
-/* VOCAB */
-.dict-btn{width:36px;height:36px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.dict-btn:hover{background:var(--accent-soft);border-color:var(--accent)}
-.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
-.sheet-overlay.show{opacity:1;pointer-events:auto}
-.dict-sheet{position:fixed;bottom:0;left:0;right:0;max-height:75vh;min-height:75vh;background:var(--surface);border-radius:20px 20px 0 0;z-index:201;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,0,.67,0);display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.15)}
-.dict-sheet.show{transform:translateY(0);transition-timing-function:cubic-bezier(.33,1,.68,1)}
-.sheet-handle-wrap{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid var(--border);position:relative}
-.sheet-handle{width:36px;height:4px;border-radius:2px;background:var(--border);position:absolute;left:50%;transform:translateX(-50%);top:8px}
-.sheet-title{font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--text);margin-top:8px}
-.sheet-close{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:none;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);margin-top:8px}
-.sheet-body{padding:16px 20px 32px;overflow-y:auto;flex:1}
-.search-wrap{position:relative;margin-bottom:16px}
-.search-input{width:100%;padding:13px 16px 13px 44px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);outline:none;transition:border-color .18s}
-.search-input:focus{border-color:var(--accent)}
-.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none}
-.dict-empty{text-align:center;padding:32px 20px;color:var(--muted);font-size:13px}
-.dict-empty .emoji{font-size:32px;margin-bottom:10px}
-.dict-item{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px}
-.dict-item-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
-.dict-item-es{font-family:'Fraunces',serif;font-size:17px;font-weight:600;color:var(--text)}
-.dict-item-type{font-size:10px;font-family:'Space Mono',monospace;padding:2px 8px;border-radius:20px;flex-shrink:0;margin-left:8px;margin-top:3px}
-.type-phrase{background:var(--accent-soft);color:var(--accent)}.type-word{background:var(--accent2-soft);color:var(--accent2)}
-.dict-item-jp{font-size:13px;color:var(--muted);margin-bottom:10px}
-.dict-item-lessons{display:flex;flex-wrap:wrap;gap:6px}
-.lesson-chip{padding:4px 10px;border-radius:20px;background:var(--surface);border:1px solid var(--border);font-size:11px;font-family:'Space Mono',monospace;color:var(--accent2);cursor:pointer}
-.flash-modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
-.flash-mode-card{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all .2s;text-align:center}
-.flash-mode-card:hover{border-color:var(--accent)}.flash-mode-card.selected{border-color:var(--accent);background:var(--accent-soft)}
-.flash-mode-icon{font-size:28px;margin-bottom:8px}
-.flash-mode-title{font-weight:700;font-size:13px;color:var(--text);margin-bottom:3px}
-.flash-mode-desc{font-size:11px;color:var(--muted);line-height:1.5}
-.category-section{margin-bottom:18px}
-.section-label{font-size:11px;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px}
-.category-chips{display:flex;flex-wrap:wrap;gap:7px}
-.cat-chip{padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .18s}
-.cat-chip.selected{background:var(--accent);color:#fff;border-color:var(--accent)}.cat-chip.all-chip.selected{background:var(--text);border-color:var(--text)}
-.flash-settings{display:flex;gap:10px;margin-bottom:20px;align-items:flex-end}
-.setting-group{flex:1}
-.setting-label{font-size:11px;color:var(--muted);margin-bottom:6px;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.06em}
-.dir-toggle{display:flex;background:var(--surface2);border-radius:10px;padding:3px}
-.dir-btn{flex:1;padding:7px 6px;border-radius:8px;border:none;font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;transition:all .18s;background:none;color:var(--muted);text-align:center}
-.dir-btn.active{background:var(--surface);color:var(--text);box-shadow:0 1px 6px rgba(0,0,0,.08)}
-.count-input{width:100%;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;text-align:center}
-.btn-start{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s;box-shadow:0 3px 14px rgba(200,96,26,.28)}
-#flash-game{display:none}
-.flash-progress-wrap{margin-bottom:20px}
-.flash-progress-bar{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-bottom:6px}
-.flash-progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s ease}
-.flash-progress-label{display:flex;justify-content:space-between;font-size:11px;font-family:'Space Mono',monospace;color:var(--muted)}
-.flip-card-wrap{perspective:1000px;margin-bottom:20px;cursor:pointer}
-.flip-card{width:100%;min-height:200px;transform-style:preserve-3d;transition:transform .45s ease;position:relative}
-.flip-card.flipped{transform:rotateY(180deg)}
-.flip-front,.flip-back{position:absolute;width:100%;min-height:200px;backface-visibility:hidden;border-radius:20px;padding:28px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow)}
-.flip-front{background:var(--surface);border:1px solid var(--border)}
-.flip-back{background:#2A2420;color:#F7F5F0;transform:rotateY(180deg)}
-.flip-hint{font-size:11px;font-family:'Space Mono',monospace;color:var(--muted);margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em}
-.flip-back .flip-hint{color:rgba(247,245,240,.4)}
-.flip-main{font-family:'Fraunces',serif;font-size:26px;font-weight:600;line-height:1.3;margin-bottom:8px}
-.flip-sub{font-size:13px;color:var(--muted);line-height:1.6}
-.flip-back .flip-sub{color:rgba(247,245,240,.6)}
-.flip-tap-hint{font-size:11px;color:var(--border);margin-top:16px;font-family:'Space Mono',monospace}
-.judge-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-.judge-btns.hidden{visibility:hidden}
-.btn-wrong{padding:14px;border-radius:14px;border:none;background:var(--red-soft);color:var(--red);font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
-.btn-correct{padding:14px;border-radius:14px;border:none;background:var(--green-soft);color:var(--green);font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
-.btn-wrong:hover{background:var(--red);color:#fff}.btn-correct:hover{background:var(--green);color:#fff}
-#flash-result{display:none;text-align:center;padding:32px 20px}
-.result-icon{font-size:52px;margin-bottom:16px}
-.result-title{font-family:'Fraunces',serif;font-size:24px;font-weight:700;color:var(--text);margin-bottom:8px}
-.result-stats{display:flex;justify-content:center;gap:24px;margin:20px 0 28px}
-.result-stat{text-align:center}
-.result-stat-num{font-family:'Fraunces',serif;font-size:32px;font-weight:700}
-.result-stat-num.green{color:var(--green)}.result-stat-num.red{color:var(--red)}
-.result-stat-label{font-size:12px;color:var(--muted);margin-top:3px}
-.btn-retry{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:14px;background:var(--accent);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:12px;width:100%;justify-content:center}
-.btn-back-setup{display:inline-flex;align-items:center;gap:8px;padding:11px 28px;border-radius:14px;background:var(--surface);color:var(--muted);border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;width:100%;justify-content:center}
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+.stat-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:16px 18px; box-shadow:var(--shadow);
+  position:relative; overflow:hidden;
+}
+.stat-card::before {
+  content:''; position:absolute; top:0; right:0;
+  width:60px; height:60px; border-radius:50%; opacity:.07;
+  transform:translate(20px,-20px);
+}
+.stat-card.green::before { background:var(--green); }
+.stat-card.blue::before  { background:var(--accent2); }
+.stat-card.yellow::before { background:var(--yellow); }
+.stat-card.orange::before { background:var(--accent); }
+.stat-icon { font-size:20px; margin-bottom:8px; }
+.stat-num { font-family:'Fraunces',serif; font-size:30px; font-weight:700; line-height:1; }
+.stat-label { font-size:11px; color:var(--muted); margin-top:3px; font-weight:500; }
 
-#toast{position:fixed;bottom:calc(var(--nav-h) + 16px);left:50%;transform:translateX(-50%) translateY(20px);background:#1C1814;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;opacity:0;transition:all .25s;white-space:nowrap;pointer-events:none}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.current-lesson {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:18px; margin-bottom:20px; box-shadow:var(--shadow);
+}
+.current-lesson-label { font-size:10px; font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); margin-bottom:6px; }
+.current-lesson-name { font-family:'Fraunces',serif; font-size:18px; font-weight:600; color:var(--text); margin-bottom:12px; }
+.lesson-progress-steps { display:flex; gap:5px; margin-bottom:6px; }
+.lp-step { flex:1; height:6px; border-radius:3px; background:var(--surface2); transition:background .3s; }
+.lp-step.done { background:var(--green); }
+.lp-step.active { background:var(--accent); }
+.lesson-progress-label { font-size:11px; color:var(--muted); margin-bottom:14px; }
+.btn-resume {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  width:100%; padding:12px; background:var(--accent); color:#fff;
+  border:none; border-radius:12px;
+  font-family:'DM Sans',sans-serif; font-weight:600; font-size:14px;
+  cursor:pointer; transition:all .2s;
+  box-shadow:0 3px 12px rgba(200,96,26,.3);
+}
+.btn-resume:hover { transform:translateY(-1px); box-shadow:0 5px 18px rgba(200,96,26,.35); }
+
+.lesson-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:14px 16px; margin-bottom:10px;
+  display:flex; align-items:center; gap:14px;
+  box-shadow:var(--shadow); cursor:pointer; transition:all .18s;
+}
+.lesson-card:hover { border-color:var(--accent); transform:translateY(-1px); }
+.lesson-card-icon { width:42px; height:42px; border-radius:12px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.lesson-card-icon.done { background:var(--green-soft); }
+.lesson-card-icon.locked { background:var(--surface2); }
+.lesson-card-info { flex:1; min-width:0; }
+.lesson-card-name { font-weight:600; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lesson-card-meta { font-size:11px; color:var(--muted); margin-top:2px; font-family:'Space Mono',monospace; }
+.lesson-card-badge { font-size:10px; padding:3px 8px; border-radius:20px; font-weight:600; white-space:nowrap; flex-shrink:0; }
+.badge-done { background:var(--green-soft); color:var(--green); }
+.badge-wip  { background:var(--accent-soft); color:var(--accent); }
+.badge-new  { background:var(--surface2); color:var(--muted); }
+.badge-locked { background:var(--surface2); color:var(--muted); }
+
+/* ── PLAN BANNER (free) ── */
+.plan-banner {
+  background: linear-gradient(135deg, #1C1814 0%, #2E2620 100%);
+  border-radius: 16px; padding: 18px 20px; margin-bottom: 20px;
+  position: relative; overflow: hidden;
+}
+.plan-banner::before {
+  content: ''; position: absolute; top: -20px; right: -20px;
+  width: 100px; height: 100px; border-radius: 50%;
+  background: var(--accent); opacity: .12;
+}
+.plan-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--accent); color: #fff;
+  font-size: 10px; font-weight: 700; font-family: 'Space Mono', monospace;
+  text-transform: uppercase; letter-spacing: .06em;
+  padding: 3px 10px; border-radius: 20px; margin-bottom: 8px;
+}
+.plan-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; color: #F7F5F0; margin-bottom: 4px; }
+.plan-desc { font-size: 12px; color: rgba(247,245,240,.55); line-height: 1.6; margin-bottom: 14px; }
+.plan-features { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
+.plan-feature { font-size: 12px; color: rgba(247,245,240,.75); display: flex; align-items: center; gap: 6px; }
+.plan-feature .check { color: var(--accent); font-size: 13px; }
+.btn-upgrade {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 11px;
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 12px;
+  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px;
+  cursor: pointer; transition: all .2s;
+  box-shadow: 0 3px 14px rgba(200,96,26,.4);
+}
+.btn-upgrade:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(200,96,26,.45); }
+
+/* ── FREE LIMIT LOCK ── */
+.lock-overlay {
+  position: relative;
+}
+.lock-overlay .lock-msg {
+  display: none;
+  position: absolute; inset: 0;
+  background: rgba(247,245,240,.9); backdrop-filter: blur(4px);
+  border-radius: 16px; z-index: 10;
+  flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 24px; gap: 8px;
+}
+.lock-overlay.locked .lock-msg { display: flex; }
+.lock-icon { font-size: 32px; }
+.lock-text { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 600; color: var(--text); }
+.lock-sub { font-size: 12px; color: var(--muted); }
+.btn-lock-upgrade {
+  margin-top: 8px; padding: 10px 24px; background: var(--accent); color: #fff;
+  border: none; border-radius: 10px;
+  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 13px;
+  cursor: pointer; transition: all .2s;
+}
+
+/* ── LESSONS PAGE ── */
+.page-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:18px; }
+.page-title { font-family:'Fraunces',serif; font-size:24px; font-weight:700; color:var(--text); }
+.page-count { font-size:12px; color:var(--muted); font-family:'Space Mono',monospace; }
+
+.view-toggle { display:flex; gap:6px; margin-bottom:14px; }
+.view-btn {
+  padding:7px 14px; border-radius:8px;
+  border:1px solid var(--border); background:var(--surface);
+  font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500;
+  color:var(--muted); cursor:pointer; transition:all .18s;
+  display:flex; align-items:center; gap:5px;
+}
+.view-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+.filter-tabs { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-bottom:18px; scrollbar-width:none; }
+.filter-tabs::-webkit-scrollbar { display:none; }
+.filter-tab {
+  padding:7px 14px; border-radius:20px;
+  border:1px solid var(--border); background:var(--surface);
+  font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500;
+  color:var(--muted); cursor:pointer; transition:all .18s; white-space:nowrap; flex-shrink:0;
+}
+.filter-tab.active { background:var(--text); color:#fff; border-color:var(--text); }
+.filter-tab .dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:5px; vertical-align:middle; }
+.dot-all { background:var(--muted); } .dot-done { background:var(--green); }
+.dot-wip { background:var(--accent); } .dot-new { background:var(--accent2); }
+
+.card-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.lesson-card-item { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:var(--shadow); cursor:pointer; transition:all .2s; }
+.lesson-card-item:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,.1); }
+.lesson-card-thumb { height:88px; display:flex; align-items:center; justify-content:center; font-size:36px; position:relative; }
+.lesson-card-thumb.done { background:var(--green-soft); }
+.lesson-card-thumb.wip  { background:var(--accent-soft); }
+.lesson-card-thumb.new  { background:var(--accent2-soft); }
+.lesson-card-thumb.locked { background:var(--surface2); filter:grayscale(.6); }
+.status-pip { position:absolute; top:8px; right:8px; width:8px; height:8px; border-radius:50%; }
+.pip-done { background:var(--green); } .pip-wip { background:var(--accent); } .pip-new { background:var(--accent2); }
+.lesson-card-body { padding:12px 12px 14px; }
+.lesson-card-name { font-weight:600; font-size:13px; color:var(--text); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lesson-card-meta { font-size:10px; color:var(--muted); font-family:'Space Mono',monospace; margin-bottom:10px; }
+.lesson-card-progress { display:flex; gap:3px; margin-bottom:10px; }
+.lcp { flex:1; height:4px; border-radius:2px; background:var(--surface2); }
+.lcp.done { background:var(--green); } .lcp.active { background:var(--accent); }
+.btn-card-action { width:100%; padding:8px; border:none; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:600; cursor:pointer; transition:all .18s; }
+.btn-card-action.done { background:var(--green-soft); color:var(--green); }
+.btn-card-action.wip  { background:var(--accent-soft); color:var(--accent); }
+.btn-card-action.new  { background:var(--accent2-soft); color:var(--accent2); }
+.btn-card-action.locked { background:var(--surface2); color:var(--muted); }
+.lesson-stars { display:flex; gap:3px; align-items:center; margin-bottom:5px; }
+.star { font-size:13px; line-height:1; transition:transform .2s; }
+.star.filled { filter:none; opacity:1; } .star.empty { filter:grayscale(1); opacity:0.3; }
+
+.lesson-list-item { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 16px; margin-bottom:10px; display:flex; align-items:center; gap:14px; box-shadow:var(--shadow); cursor:pointer; transition:all .18s; }
+.lesson-list-item:hover { border-color:var(--accent); transform:translateY(-1px); }
+.lesson-list-item.is-locked { opacity:.7; }
+.lesson-list-icon { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.lesson-list-icon.done { background:var(--green-soft); } .lesson-list-icon.wip { background:var(--accent-soft); }
+.lesson-list-icon.new { background:var(--accent2-soft); } .lesson-list-icon.locked { background:var(--surface2); }
+.lesson-list-info { flex:1; min-width:0; }
+.lesson-list-name { font-weight:600; font-size:14px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:3px; }
+.lesson-list-meta { font-size:11px; color:var(--muted); font-family:'Space Mono',monospace; margin-bottom:6px; }
+.lesson-list-progress { display:flex; gap:3px; }
+.llp { flex:1; height:3px; border-radius:2px; background:var(--surface2); }
+.llp.done { background:var(--green); } .llp.active { background:var(--accent); }
+.btn-list-action { padding:8px 14px; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:all .18s; white-space:nowrap; flex-shrink:0; }
+.btn-list-action.done { background:var(--green-soft); color:var(--green); }
+.btn-list-action.wip  { background:var(--accent); color:#fff; box-shadow:0 2px 10px rgba(200,96,26,.25); }
+.btn-list-action.new  { background:var(--accent2-soft); color:var(--accent2); }
+.btn-list-action.locked { background:var(--surface2); color:var(--muted); }
+.empty-msg { text-align:center; padding:48px 20px; color:var(--muted); font-size:14px; }
+
+/* ── VOCAB / FLASHCARD ── */
+.dict-btn { padding:7px 14px; border-radius:20px; border:1px solid var(--border); background:var(--surface); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; color:var(--muted); cursor:pointer; transition:all .18s; }
+.dict-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+.flash-modes { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
+.flash-mode-card { background:var(--surface); border:2px solid var(--border); border-radius:14px; padding:16px 14px; cursor:pointer; transition:all .2s; text-align:center; }
+.flash-mode-card:hover { border-color:var(--accent); transform:translateY(-1px); }
+.flash-mode-card.selected { border-color:var(--accent); background:var(--accent-soft); }
+.flash-mode-icon { font-size:28px; margin-bottom:8px; }
+.flash-mode-title { font-weight:700; font-size:13px; color:var(--text); margin-bottom:3px; }
+.flash-mode-desc { font-size:11px; color:var(--muted); line-height:1.5; }
+
+.section-label { font-size:11px; font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:10px; }
+.category-section { margin-bottom:18px; }
+.category-chips { display:flex; flex-wrap:wrap; gap:7px; }
+.cat-chip { padding:7px 14px; border-radius:20px; border:1px solid var(--border); background:var(--surface); font-size:12px; font-weight:500; color:var(--muted); cursor:pointer; transition:all .18s; }
+.cat-chip:hover { border-color:var(--accent); color:var(--accent); }
+.cat-chip.selected { background:var(--accent); color:#fff; border-color:var(--accent); }
+.cat-chip.all-chip.selected { background:var(--text); border-color:var(--text); }
+
+.flash-settings { display:flex; gap:10px; margin-bottom:20px; align-items:flex-end; }
+.setting-group { flex:1; }
+.setting-label { font-size:11px; color:var(--muted); margin-bottom:6px; font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:.06em; }
+.dir-toggle { display:flex; background:var(--surface2); border-radius:10px; padding:3px; }
+.dir-btn { flex:1; padding:7px 6px; border-radius:8px; border:none; font-family:'Space Mono',monospace; font-size:10px; cursor:pointer; transition:all .18s; background:none; color:var(--muted); text-align:center; }
+.dir-btn.active { background:var(--surface); color:var(--text); box-shadow:0 1px 6px rgba(0,0,0,.08); }
+.count-input { width:100%; padding:10px 12px; background:var(--surface); border:1px solid var(--border); border-radius:10px; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text); outline:none; transition:border-color .18s; text-align:center; }
+.count-input:focus { border-color:var(--accent); }
+.btn-start { width:100%; padding:14px; background:var(--accent); color:#fff; border:none; border-radius:14px; font-family:'DM Sans',sans-serif; font-weight:700; font-size:15px; cursor:pointer; transition:all .2s; box-shadow:0 3px 14px rgba(200,96,26,.28); }
+.btn-start:hover { transform:translateY(-1px); box-shadow:0 5px 20px rgba(200,96,26,.35); }
+
+#flash-game { display:none; }
+.flash-progress-wrap { margin-bottom:20px; }
+.flash-progress-bar { height:5px; background:var(--surface2); border-radius:3px; overflow:hidden; margin-bottom:6px; }
+.flash-progress-fill { height:100%; background:var(--accent); border-radius:3px; transition:width .3s ease; }
+.flash-progress-label { display:flex; justify-content:space-between; font-size:11px; font-family:'Space Mono',monospace; color:var(--muted); }
+
+.flip-card-wrap { perspective:1000px; margin-bottom:20px; cursor:pointer; }
+.flip-card { width:100%; min-height:200px; transform-style:preserve-3d; transition:transform .45s ease; position:relative; }
+.flip-card.flipped { transform:rotateY(180deg); }
+.flip-front, .flip-back { position:absolute; width:100%; min-height:200px; backface-visibility:hidden; border-radius:20px; padding:28px 24px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; box-shadow:var(--shadow); }
+.flip-front { background:var(--surface); border:1px solid var(--border); }
+.flip-back { background:#2A2420; color:#F7F5F0; transform:rotateY(180deg); border:1px solid #2A2420; }
+.flip-hint { font-size:11px; font-family:'Space Mono',monospace; color:var(--muted); margin-bottom:14px; text-transform:uppercase; letter-spacing:.06em; }
+.flip-back .flip-hint { color:rgba(247,245,240,.4); }
+.flip-main { font-family:'Fraunces',serif; font-size:26px; font-weight:600; line-height:1.3; margin-bottom:8px; }
+.flip-sub { font-size:13px; color:var(--muted); line-height:1.6; }
+.flip-back .flip-sub { color:rgba(247,245,240,.6); }
+.flip-tap-hint { font-size:11px; color:var(--border); margin-top:16px; font-family:'Space Mono',monospace; }
+
+.judge-btns { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+.judge-btns.hidden { visibility:hidden; }
+.btn-wrong { padding:14px; border-radius:14px; border:none; background:var(--red-soft); color:var(--red); font-family:'DM Sans',sans-serif; font-weight:700; font-size:15px; cursor:pointer; transition:all .18s; display:flex; align-items:center; justify-content:center; gap:6px; }
+.btn-correct { padding:14px; border-radius:14px; border:none; background:var(--green-soft); color:var(--green); font-family:'DM Sans',sans-serif; font-weight:700; font-size:15px; cursor:pointer; transition:all .18s; display:flex; align-items:center; justify-content:center; gap:6px; }
+.btn-wrong:hover { background:var(--red); color:#fff; } .btn-correct:hover { background:var(--green); color:#fff; }
+
+#flash-result { display:none; text-align:center; padding:32px 20px; }
+.result-icon { font-size:52px; margin-bottom:16px; }
+.result-title { font-family:'Fraunces',serif; font-size:24px; font-weight:700; color:var(--text); margin-bottom:8px; }
+.result-stats { display:flex; justify-content:center; gap:24px; margin:20px 0 28px; }
+.result-stat { text-align:center; }
+.result-stat-num { font-family:'Fraunces',serif; font-size:32px; font-weight:700; }
+.result-stat-num.green { color:var(--green); } .result-stat-num.red { color:var(--red); }
+.result-stat-label { font-size:12px; color:var(--muted); margin-top:3px; }
+.btn-retry { display:inline-flex; align-items:center; gap:8px; padding:13px 28px; border-radius:14px; background:var(--accent); color:#fff; border:none; font-family:'DM Sans',sans-serif; font-weight:700; font-size:14px; cursor:pointer; transition:all .2s; margin-bottom:12px; width:100%; justify-content:center; }
+.btn-back-setup { display:inline-flex; align-items:center; gap:8px; padding:11px 28px; border-radius:14px; background:var(--surface); color:var(--muted); border:1px solid var(--border); font-family:'DM Sans',sans-serif; font-weight:600; font-size:14px; cursor:pointer; transition:all .2s; width:100%; justify-content:center; }
+
+/* ── DICT SHEET ── */
+.sheet-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:200; }
+.sheet-overlay.show { display:block; }
+.dict-sheet { position:fixed; bottom:0; left:0; right:0; background:var(--surface); border-radius:20px 20px 0 0; z-index:201; transform:translateY(100%); transition:transform .3s cubic-bezier(.32,.72,0,1); max-height:80vh; display:flex; flex-direction:column; }
+.dict-sheet.show { transform:translateY(0); }
+.sheet-handle-wrap { padding:12px 20px 0; display:flex; align-items:center; }
+.sheet-handle { width:36px; height:4px; border-radius:2px; background:var(--border); margin:0 auto 12px; flex-shrink:0; }
+.sheet-title { font-family:'Fraunces',serif; font-size:16px; font-weight:600; flex:1; }
+.sheet-close { background:none; border:none; font-size:18px; cursor:pointer; color:var(--muted); padding:4px; }
+.sheet-body { padding:0 20px 20px; overflow-y:auto; flex:1; }
+.search-wrap { position:relative; margin-bottom:14px; }
+.search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; }
+.search-input { width:100%; padding:11px 14px 11px 40px; background:var(--surface2); border:1px solid var(--border); border-radius:12px; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text); outline:none; transition:border-color .18s; }
+.search-input:focus { border-color:var(--accent); background:var(--surface); }
+.dict-empty { text-align:center; padding:32px 20px; color:var(--muted); font-size:13px; }
+.dict-empty .emoji { font-size:32px; margin-bottom:8px; }
+.dict-item { background:var(--surface2); border-radius:12px; padding:14px 16px; margin-bottom:8px; }
+.dict-item-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+.dict-item-es { font-family:'Fraunces',serif; font-size:16px; font-weight:600; color:var(--text); }
+.dict-item-type { font-size:10px; padding:2px 8px; border-radius:20px; font-weight:600; }
+.type-phrase { background:var(--accent-soft); color:var(--accent); }
+.type-word { background:var(--accent2-soft); color:var(--accent2); }
+.dict-item-jp { font-size:13px; color:var(--muted); margin-bottom:6px; }
+.dict-item-lessons { display:flex; flex-wrap:wrap; gap:5px; }
+.lesson-chip { font-size:10px; padding:3px 8px; border-radius:20px; background:var(--surface); border:1px solid var(--border); color:var(--muted); }
+.lesson-chip:hover { background:var(--accent2-soft); border-color:var(--accent2); }
+
+/* ── PLAN / UPGRADE SCREEN ── */
+.upgrade-hero {
+  background: linear-gradient(160deg, #1C1814 0%, #2E2620 60%, #3A2A1C 100%);
+  border-radius: 20px; padding: 28px 24px; margin-bottom: 24px;
+  text-align: center; position: relative; overflow: hidden;
+}
+.upgrade-hero::before {
+  content: ''; position: absolute; top: -40px; right: -40px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: var(--accent); opacity: .1;
+}
+.upgrade-star { font-size: 40px; margin-bottom: 12px; }
+.upgrade-title { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700; color: #F7F5F0; margin-bottom: 8px; }
+.upgrade-subtitle { font-size: 13px; color: rgba(247,245,240,.55); line-height: 1.7; }
+
+.plan-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.plan-col {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 18px 16px; box-shadow: var(--shadow);
+}
+.plan-col.pro { border-color: var(--accent); background: linear-gradient(160deg, #fff 0%, #fff8f4 100%); }
+.plan-col-badge { font-size: 9px; font-weight: 700; font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: .07em; padding: 2px 8px; border-radius: 20px; margin-bottom: 10px; display: inline-block; }
+.badge-free { background: var(--surface2); color: var(--muted); }
+.badge-pro { background: var(--accent); color: #fff; }
+.plan-col-price { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 14px; line-height: 1; }
+.plan-col-price span { font-size: 12px; font-weight: 400; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+.plan-col-items { display: flex; flex-direction: column; gap: 6px; }
+.plan-col-item { font-size: 12px; color: var(--muted); display: flex; align-items: flex-start; gap: 5px; line-height: 1.5; }
+.plan-col-item .ok { color: var(--green); } .plan-col-item .no { color: var(--border); }
+
+.btn-upgrade-full {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 14px;
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 14px;
+  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px;
+  cursor: pointer; transition: all .2s; margin-bottom: 12px;
+  box-shadow: 0 4px 18px rgba(200,96,26,.35);
+}
+.btn-upgrade-full:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(200,96,26,.4); }
+.upgrade-note { font-size: 11px; color: var(--muted); text-align: center; font-family: 'Space Mono', monospace; }
+
+/* ── TOAST ── */
+#toast {
+  position:fixed; bottom:calc(var(--nav-h) + 16px); left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:#1C1814; color:#fff;
+  padding:10px 20px; border-radius:20px;
+  font-size:13px; z-index:9999;
+  opacity:0; transition:all .25s; white-space:nowrap; pointer-events:none;
+}
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ── PLAN SWITCHER (dev only) ── */
+.dev-switcher {
+  position: fixed; top: 70px; right: 12px; z-index: 300;
+  background: var(--text); border-radius: 12px; padding: 8px 12px;
+  display: flex; gap: 6px; align-items: center;
+  box-shadow: var(--shadow-lg);
+}
+.dev-label { font-size: 9px; color: rgba(255,255,255,.5); font-family: 'Space Mono', monospace; white-space: nowrap; }
+.dev-btn { padding: 4px 10px; border: none; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all .15s; background: rgba(255,255,255,.1); color: rgba(255,255,255,.6); font-family: 'DM Sans', sans-serif; }
+.dev-btn.active { background: var(--accent); color: #fff; }
 </style>
 </head>
 <body>
 
-<div id="loading-screen"><div class="loading-logo">VOZ.</div></div>
+<!-- ══════════════ DEV PLAN SWITCHER (開発確認用) ══════════════ -->
+<div class="dev-switcher">
+  <span class="dev-label">プラン確認：</span>
+  <button class="dev-btn active" id="dev-free" onclick="setPlan('free')">Free</button>
+  <button class="dev-btn" id="dev-pro" onclick="setPlan('pro')">Pro</button>
+</div>
 
-<!-- AUTH -->
-<div id="auth-wrapper">
-  <div class="auth-logo">VOZ.</div>
-  <div class="auth-tagline">escucha, copia, hazlo tu voz.</div>
-
-  <!-- LOGIN -->
-  <div id="auth-login" class="auth-card">
-    <div class="auth-card-title">おかえりなさい 👋</div>
-    <div class="auth-card-sub">メールアドレスとパスワードでログイン</div>
-    <div class="auth-msg error" id="login-error"></div>
-    <div class="auth-field">
-      <label class="auth-label">メールアドレス</label>
-      <input class="auth-input" type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
-    </div>
-    <div class="auth-field">
-      <label class="auth-label">パスワード</label>
-      <input class="auth-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
-    </div>
-    <button class="btn-auth" id="btn-login" onclick="doLogin()">
-      <div class="spinner"></div><span class="btn-label">ログイン</span>
-    </button>
-    <div class="auth-switch">アカウントをお持ちでない方は <a onclick="showSignup()">新規登録</a></div>
+<!-- ══════════════ HOME ══════════════ -->
+<div class="screen active" id="screen-home">
+  <div class="top-bar">
+    <div class="top-bar-logo">VOZ.<span>escucha, copia, hazlo tu voz.</span></div>
+    <div class="user-dot" onclick="switchTab('plan')" title="プランを見る">Y</div>
   </div>
+  <div class="main">
+    <div class="greeting">
+      <div class="greeting-sub">Bienvenida</div>
+      <div class="greeting-name"><span style="color:rgba(247,245,240,.55)">おかえりなさい、</span><em>Yuki</em> 👋</div>
+    </div>
 
-  <!-- SIGNUP -->
-  <div id="auth-signup" class="auth-card" style="display:none">
-    <div class="auth-card-title">はじめまして 🎉</div>
-    <div class="auth-card-sub">アカウントを作成してVOZを始めましょう</div>
-    <div class="auth-msg error" id="signup-error"></div>
-    <div class="auth-msg success" id="signup-success"></div>
-    <div class="auth-field">
-      <label class="auth-label">メールアドレス</label>
-      <input class="auth-input" type="email" id="signup-email" placeholder="you@example.com" autocomplete="email">
+    <!-- フリープランバナー（Proでは非表示） -->
+    <div class="plan-banner" id="free-home-banner">
+      <div class="plan-badge">✦ Free プラン</div>
+      <div class="plan-title">Proにアップグレードしよう</div>
+      <div class="plan-desc">すべてのレッスン・単語帳・復習機能が使えるようになります。</div>
+      <div class="plan-features">
+        <div class="plan-feature"><span class="check">✦</span> レッスン無制限（現在3件まで）</div>
+        <div class="plan-feature"><span class="check">✦</span> フラッシュカード全カテゴリ解放</div>
+        <div class="plan-feature"><span class="check">✦</span> 学習記録・ストリーク全機能</div>
+      </div>
+      <button class="btn-upgrade" onclick="switchTab('plan')">✦ Proプランを見る</button>
     </div>
-    <div class="auth-field">
-      <label class="auth-label">パスワード（6文字以上）</label>
-      <input class="auth-input" type="password" id="signup-password" placeholder="••••••••" autocomplete="new-password">
+
+    <div class="streak-banner">
+      <div class="streak-icon">🔥</div>
+      <div class="streak-info">
+        <div class="streak-num" id="streak-num">7</div>
+        <div class="streak-label">日連続レッスン中！</div>
+      </div>
+      <div class="streak-days" id="streak-days"></div>
     </div>
-    <div class="auth-field">
-      <label class="auth-label">パスワード（確認）</label>
-      <input class="auth-input" type="password" id="signup-password2" placeholder="••••••••" autocomplete="new-password">
+
+    <div class="stats-grid">
+      <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-num">12</div><div class="stat-label">完了レッスン数</div></div>
+      <div class="stat-card blue"><div class="stat-icon">📖</div><div class="stat-num">348</div><div class="stat-label">触れた単語数</div></div>
+      <div class="stat-card yellow lock-overlay" id="stat-phrases">
+        <div class="stat-icon">💬</div><div class="stat-num">64</div><div class="stat-label">覚えたフレーズ数</div>
+        <div class="lock-msg"><div class="lock-icon">🔒</div><div class="lock-text">Pro限定</div><div class="lock-sub">プランをアップグレード</div><button class="btn-lock-upgrade" onclick="switchTab('plan')">詳しく</button></div>
+      </div>
+      <div class="stat-card orange lock-overlay" id="stat-days">
+        <div class="stat-icon">📅</div><div class="stat-num">23</div><div class="stat-label">累計学習日数</div>
+        <div class="lock-msg"><div class="lock-icon">🔒</div><div class="lock-text">Pro限定</div><div class="lock-sub">プランをアップグレード</div><button class="btn-lock-upgrade" onclick="switchTab('plan')">詳しく</button></div>
+      </div>
     </div>
-    <button class="btn-auth" id="btn-signup" onclick="doSignup()">
-      <div class="spinner"></div><span class="btn-label">アカウントを作成</span>
-    </button>
-    <div class="auth-switch">すでにアカウントをお持ちの方は <a onclick="showLogin()">ログイン</a></div>
+
+    <div class="section-title">途中のレッスン</div>
+    <div class="current-lesson">
+      <div class="current-lesson-label">進行中</div>
+      <div class="current-lesson-name">Bluey Ep3-2</div>
+      <div class="lesson-progress-steps">
+        <div class="lp-step done"></div>
+        <div class="lp-step done"></div>
+        <div class="lp-step done"></div>
+        <div class="lp-step active"></div>
+        <div class="lp-step"></div>
+      </div>
+      <div class="lesson-progress-label">③ Entender まで完了</div>
+      <button class="btn-resume" onclick="showToast('レッスンを再開します...')">▶ 続きから始める</button>
+    </div>
+
+    <div class="section-title">
+      最近のレッスン
+      <a href="#" onclick="switchTab('lessons');return false;">すべて見る</a>
+    </div>
+    <div class="lesson-card" onclick="showToast('Bluey Ep3-1 を開きます')">
+      <div class="lesson-card-icon done">🎬</div>
+      <div class="lesson-card-info"><div class="lesson-card-name">Bluey Ep3-1</div><div class="lesson-card-meta">2日前</div></div>
+      <span class="lesson-card-badge badge-done">完了</span>
+    </div>
+    <div class="lesson-card" onclick="showToast('Bluey Ep2-4 を開きます')">
+      <div class="lesson-card-icon done">🎬</div>
+      <div class="lesson-card-info"><div class="lesson-card-name">Bluey Ep2-4</div><div class="lesson-card-meta">4日前</div></div>
+      <span class="lesson-card-badge badge-done">完了</span>
+    </div>
+    <!-- Freeでロックされるカード -->
+    <div class="lesson-card" id="home-locked-card" onclick="showLockedMsg()">
+      <div class="lesson-card-icon locked">🔒</div>
+      <div class="lesson-card-info"><div class="lesson-card-name">Bluey Ep3-3</div><div class="lesson-card-meta">Pro限定</div></div>
+      <span class="lesson-card-badge badge-locked">🔒 Pro</span>
+    </div>
   </div>
 </div>
 
-<!-- APP -->
-<div id="app-wrapper">
-
-  <!-- HOME -->
-  <div class="screen active" id="screen-home">
-    <div class="top-bar">
-      <div class="top-bar-logo">VOZ.<span>escucha, copia, hazlo tu voz.</span></div>
-      <div class="top-bar-right">
-        <button class="btn-logout" onclick="doLogout()">ログアウト</button>
-        <div class="user-dot" id="user-avatar">Y</div>
-      </div>
-    </div>
-    <div class="main">
-      <div class="greeting">
-        <div class="greeting-sub">Bienvenida</div>
-        <div class="greeting-name"><span style="color:rgba(247,245,240,.55)">おかえりなさい、</span><em id="greeting-name">Yuki</em> 👋</div>
-      </div>
-      <div class="streak-banner">
-        <div class="streak-icon">🔥</div>
-        <div class="streak-info"><div class="streak-num">7</div><div class="streak-label">日連続レッスン中！</div></div>
-        <div class="streak-days">
-          <div class="streak-day done"><div class="dot"></div><span>月</span></div>
-          <div class="streak-day done"><div class="dot"></div><span>火</span></div>
-          <div class="streak-day done"><div class="dot"></div><span>水</span></div>
-          <div class="streak-day done"><div class="dot"></div><span>木</span></div>
-          <div class="streak-day done"><div class="dot"></div><span>金</span></div>
-          <div class="streak-day done"><div class="dot"></div><span>土</span></div>
-          <div class="streak-day today"><div class="dot"></div><span>日</span></div>
-        </div>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-num">12</div><div class="stat-label">完了レッスン数</div></div>
-        <div class="stat-card blue"><div class="stat-icon">📖</div><div class="stat-num">348</div><div class="stat-label">触れた単語数</div></div>
-        <div class="stat-card yellow"><div class="stat-icon">💬</div><div class="stat-num">64</div><div class="stat-label">覚えたフレーズ数</div></div>
-        <div class="stat-card orange"><div class="stat-icon">📅</div><div class="stat-num">23</div><div class="stat-label">累計学習日数</div></div>
-      </div>
-      <div class="section-title">途中のレッスン</div>
-      <div class="current-lesson">
-        <div class="current-lesson-label">進行中</div>
-        <div class="current-lesson-name">Bluey Ep3-2</div>
-        <div class="lesson-progress-steps">
-          <div class="lp-step done"></div><div class="lp-step done"></div><div class="lp-step done"></div><div class="lp-step active"></div><div class="lp-step"></div>
-        </div>
-        <div class="lesson-progress-label">④ Reconstruir まで完了</div>
-        <button class="btn-resume" onclick="showToast('レッスンを再開します...')">▶ 続きから始める</button>
-      </div>
-      <div class="section-title">最近のレッスン <a href="#" onclick="switchTab('lessons');return false;">すべて見る</a></div>
-      <div class="lesson-card"><div class="lesson-card-icon done">🎬</div><div class="lesson-card-info"><div class="lesson-card-name">Bluey Ep3-1</div><div class="lesson-card-meta">2日前</div></div><span class="lesson-card-badge badge-done">完了</span></div>
-      <div class="lesson-card"><div class="lesson-card-icon done">🎬</div><div class="lesson-card-info"><div class="lesson-card-name">Bluey Ep2-4</div><div class="lesson-card-meta">4日前</div></div><span class="lesson-card-badge badge-done">完了</span></div>
-      <div class="lesson-card" style="opacity:.6"><div class="lesson-card-icon">🔒</div><div class="lesson-card-info"><div class="lesson-card-name">Bluey Ep3-3</div><div class="lesson-card-meta">未開始</div></div><span class="lesson-card-badge badge-new">NEW</span></div>
+<!-- ══════════════ VOCAB / FLASHCARD ══════════════ -->
+<div class="screen" id="screen-vocab">
+  <div class="top-bar">
+    <div class="top-bar-logo compact">VOZ.</div>
+    <div class="top-bar-right">
+      <button class="dict-btn" onclick="openDict()">🔍 辞書</button>
+      <div class="user-dot" onclick="switchTab('plan')">Y</div>
     </div>
   </div>
+  <div class="main">
+    <div id="view-flash">
+      <div id="flash-setup">
+        <div class="section-label" style="margin-bottom:10px">モードを選ぶ</div>
+        <div class="flash-modes">
+          <div class="flash-mode-card selected" id="mode-phrase" onclick="selectMode('phrase')">
+            <div class="flash-mode-icon">💬</div>
+            <div class="flash-mode-title">フレーズ</div>
+            <div class="flash-mode-desc">よく使うフレーズを練習</div>
+          </div>
+          <div class="flash-mode-card" id="mode-word" onclick="selectMode('word')">
+            <div class="flash-mode-icon">📖</div>
+            <div class="flash-mode-title">単語</div>
+            <div class="flash-mode-desc">カテゴリ別の単語を練習</div>
+          </div>
+        </div>
 
-  <!-- VOCABULARY -->
-  <div class="screen" id="screen-vocab">
-    <div class="top-bar">
-      <div class="top-bar-logo compact">VOZ.</div>
-      <div class="top-bar-right">
-        <button class="dict-btn" onclick="openDict()">🔍</button>
-        <div class="user-dot" id="user-avatar2">Y</div>
+        <!-- カテゴリ（Pro限定） -->
+        <div id="category-section" class="category-section lock-overlay" style="display:none">
+          <div class="section-label">カテゴリを選ぶ</div>
+          <div class="category-chips">
+            <div class="cat-chip all-chip selected" onclick="toggleCat('all',this)">すべて</div>
+            <div class="cat-chip" onclick="toggleCat('furniture',this)">🪑 家具</div>
+            <div class="cat-chip" onclick="toggleCat('food',this)">🍽 料理・食べ物</div>
+            <div class="cat-chip" onclick="toggleCat('travel',this)">✈️ 旅行</div>
+            <div class="cat-chip" onclick="toggleCat('place',this)">📍 場所</div>
+            <div class="cat-chip" onclick="toggleCat('daily',this)">☀️ 日常</div>
+          </div>
+          <div class="lock-msg"><div class="lock-icon">🔒</div><div class="lock-text">Pro限定</div><div class="lock-sub">カテゴリ選択はProプランで</div><button class="btn-lock-upgrade" onclick="switchTab('plan')">アップグレード</button></div>
+        </div>
+
+        <div class="flash-settings">
+          <div class="setting-group">
+            <div class="setting-label">出題方向</div>
+            <div class="dir-toggle">
+              <button class="dir-btn active" id="dir-es" onclick="setDir('es')">ES → JP</button>
+              <button class="dir-btn" id="dir-jp" onclick="setDir('jp')">JP → ES</button>
+            </div>
+          </div>
+          <div class="setting-group" style="max-width:90px">
+            <div class="setting-label">枚数</div>
+            <input class="count-input" type="number" id="card-count" value="5" min="1" max="50">
+          </div>
+        </div>
+        <div id="flash-limit-note" style="font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:14px;text-align:center">
+          ※ Freeプランはフレーズのみ・最大5枚
+        </div>
+        <button class="btn-start" onclick="startFlash()">▶ 始める</button>
       </div>
-    </div>
-    <div class="main">
-      <div id="view-flash">
-        <div id="flash-setup">
-          <div class="section-label" style="margin-bottom:10px">モードを選ぶ</div>
-          <div class="flash-modes">
-            <div class="flash-mode-card selected" id="mode-phrase" onclick="selectMode('phrase')"><div class="flash-mode-icon">💬</div><div class="flash-mode-title">フレーズ</div><div class="flash-mode-desc">よく使うフレーズを練習</div></div>
-            <div class="flash-mode-card" id="mode-word" onclick="selectMode('word')"><div class="flash-mode-icon">📖</div><div class="flash-mode-title">単語</div><div class="flash-mode-desc">カテゴリ別の単語を練習</div></div>
-          </div>
-          <div id="category-section" class="category-section" style="display:none">
-            <div class="section-label">カテゴリを選ぶ</div>
-            <div class="category-chips">
-              <div class="cat-chip all-chip selected" onclick="toggleCat('all',this)">すべて</div>
-              <div class="cat-chip" onclick="toggleCat('furniture',this)">🪑 家具</div>
-              <div class="cat-chip" onclick="toggleCat('food',this)">🍽 料理・食べ物</div>
-              <div class="cat-chip" onclick="toggleCat('travel',this)">✈️ 旅行</div>
-              <div class="cat-chip" onclick="toggleCat('place',this)">📍 場所</div>
-            </div>
-          </div>
-          <div class="flash-settings">
-            <div class="setting-group">
-              <div class="setting-label">出題方向</div>
-              <div class="dir-toggle">
-                <button class="dir-btn active" id="dir-es" onclick="setDir('es')">ES → JP</button>
-                <button class="dir-btn" id="dir-jp" onclick="setDir('jp')">JP → ES</button>
-              </div>
-            </div>
-            <div class="setting-group" style="max-width:90px">
-              <div class="setting-label">枚数</div>
-              <input class="count-input" type="number" id="card-count" value="10" min="1" max="50">
-            </div>
-          </div>
-          <button class="btn-start" onclick="startFlash()">▶ 始める</button>
+
+      <div id="flash-game">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+          <button onclick="backToSetup()" style="padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);cursor:pointer;">✕ 中断する</button>
         </div>
-        <div id="flash-game">
-          <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
-            <button onclick="backToSetup()" style="padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);cursor:pointer;">✕ 中断する</button>
-          </div>
-          <div class="flash-progress-wrap">
-            <div class="flash-progress-bar"><div class="flash-progress-fill" id="flash-fill" style="width:0%"></div></div>
-            <div class="flash-progress-label"><span id="flash-progress-text">1 / 10</span><span id="flash-score-text">✅ 0 &nbsp; ❌ 0</span></div>
-          </div>
-          <div class="flip-card-wrap" onclick="flipCard()">
-            <div class="flip-card" id="flip-card">
-              <div class="flip-front"><div class="flip-hint" id="front-hint">スペイン語</div><div class="flip-main" id="front-main">—</div><div class="flip-tap-hint">タップして答えを見る</div></div>
-              <div class="flip-back"><div class="flip-hint" id="back-hint">日本語</div><div class="flip-main" id="back-main">—</div><div class="flip-sub" id="back-sub"></div></div>
+        <div class="flash-progress-wrap">
+          <div class="flash-progress-bar"><div class="flash-progress-fill" id="flash-fill" style="width:0%"></div></div>
+          <div class="flash-progress-label"><span id="flash-progress-text">1 / 10</span><span id="flash-score-text">✅ 0 &nbsp; ❌ 0</span></div>
+        </div>
+        <div class="flip-card-wrap" onclick="flipCard()">
+          <div class="flip-card" id="flip-card">
+            <div class="flip-front">
+              <div class="flip-hint" id="front-hint">スペイン語</div>
+              <div class="flip-main" id="front-main">—</div>
+              <div class="flip-tap-hint">タップして答えを見る</div>
             </div>
-          </div>
-          <div class="judge-btns hidden" id="judge-btns">
-            <button class="btn-wrong" onclick="judge(false)">❌ もう一度</button>
-            <button class="btn-correct" onclick="judge(true)">✅ わかった！</button>
+            <div class="flip-back">
+              <div class="flip-hint" id="back-hint">日本語</div>
+              <div class="flip-main" id="back-main">—</div>
+              <div class="flip-sub" id="back-sub"></div>
+            </div>
           </div>
         </div>
-        <div id="flash-result">
-          <div class="result-icon">🎉</div>
-          <div class="result-title">お疲れさまでした！</div>
-          <div class="result-stats">
-            <div class="result-stat"><div class="result-stat-num green" id="result-correct">0</div><div class="result-stat-label">わかった</div></div>
-            <div class="result-stat"><div class="result-stat-num red" id="result-wrong">0</div><div class="result-stat-label">もう一度</div></div>
-          </div>
-          <button class="btn-retry" onclick="retryWrong()">❌ もう一度だけ復習する</button>
-          <button class="btn-back-setup" onclick="backToSetup()">↩ 最初から</button>
+        <div class="judge-btns hidden" id="judge-btns">
+          <button class="btn-wrong" onclick="judge(false)">❌ もう一度</button>
+          <button class="btn-correct" onclick="judge(true)">✅ わかった！</button>
         </div>
+      </div>
+
+      <div id="flash-result">
+        <div class="result-icon">🎉</div>
+        <div class="result-title">お疲れさまでした！</div>
+        <div class="result-stats">
+          <div class="result-stat"><div class="result-stat-num green" id="result-correct">0</div><div class="result-stat-label">わかった</div></div>
+          <div class="result-stat"><div class="result-stat-num red" id="result-wrong">0</div><div class="result-stat-label">もう一度</div></div>
+        </div>
+        <button class="btn-retry" onclick="retryWrong()">❌ もう一度だけ復習する</button>
+        <button class="btn-back-setup" onclick="backToSetup()">↩ 最初から</button>
       </div>
     </div>
   </div>
-
-  <!-- LESSONS -->
-  <div class="screen" id="screen-lessons">
-    <div class="top-bar">
-      <div class="top-bar-logo compact">VOZ.</div>
-      <div class="user-dot" id="user-avatar3">Y</div>
-    </div>
-    <div class="main">
-      <div class="page-header">
-        <div class="page-title">レッスン</div>
-        <div class="page-count" id="count-label">全6件</div>
-      </div>
-      <div class="view-toggle">
-        <button class="view-btn active" id="btn-list" onclick="setView('list')">☰ リスト</button>
-        <button class="view-btn" id="btn-card" onclick="setView('card')">⊞ カード</button>
-      </div>
-      <div class="filter-tabs">
-        <button class="filter-tab active" onclick="setFilter('all',this)"><span class="dot dot-all"></span>すべて</button>
-        <button class="filter-tab" onclick="setFilter('wip',this)"><span class="dot dot-wip"></span>途中のレッスン</button>
-        <button class="filter-tab" onclick="setFilter('done',this)"><span class="dot dot-done"></span>完了済み</button>
-        <button class="filter-tab" onclick="setFilter('new',this)"><span class="dot dot-new"></span>未開始</button>
-      </div>
-      <div id="lessons-container"></div>
-    </div>
-  </div>
-
-  <nav class="bottom-nav">
-    <button class="nav-item active" id="nav-home" onclick="switchTab('home')"><span class="nav-icon">🏠</span><span class="nav-label">ホーム</span></button>
-    <button class="nav-item" id="nav-vocab" onclick="switchTab('vocab')"><span class="nav-icon">🃏</span><span class="nav-label">Vocabulary</span></button>
-    <button class="nav-item" id="nav-lessons" onclick="switchTab('lessons')"><span class="nav-icon">🎬</span><span class="nav-label">レッスン</span></button>
-  </nav>
 </div>
 
-<!-- DICT SHEET -->
+<!-- ══════════════ LESSONS ══════════════ -->
+<div class="screen" id="screen-lessons">
+  <div class="top-bar">
+    <div class="top-bar-logo compact">VOZ.</div>
+    <div class="user-dot" onclick="switchTab('plan')">Y</div>
+  </div>
+  <div class="main">
+    <div class="page-header">
+      <div class="page-title">レッスン</div>
+      <div class="page-count" id="count-label">全6件</div>
+    </div>
+    <div class="view-toggle">
+      <button class="view-btn active" id="btn-list" onclick="setView('list')">☰ リスト</button>
+      <button class="view-btn" id="btn-card" onclick="setView('card')">⊞ カード</button>
+    </div>
+    <div class="filter-tabs">
+      <button class="filter-tab active" onclick="setFilter('all',this)"><span class="dot dot-all"></span>すべて</button>
+      <button class="filter-tab" onclick="setFilter('wip',this)"><span class="dot dot-wip"></span>途中</button>
+      <button class="filter-tab" onclick="setFilter('done',this)"><span class="dot dot-done"></span>完了</button>
+      <button class="filter-tab" onclick="setFilter('new',this)"><span class="dot dot-new"></span>未開始</button>
+    </div>
+    <div id="lessons-container"></div>
+  </div>
+</div>
+
+<!-- ══════════════ PLAN / UPGRADE ══════════════ -->
+<div class="screen" id="screen-plan">
+  <div class="top-bar">
+    <div class="top-bar-logo compact">VOZ.</div>
+    <div class="user-dot">Y</div>
+  </div>
+  <div class="main">
+    <div class="upgrade-hero">
+      <div class="upgrade-star">✦</div>
+      <div class="upgrade-title">VOZ Pro</div>
+      <div class="upgrade-subtitle">ラテンアメリカのスペイン語を<br>本気で身につけるための全機能</div>
+    </div>
+
+    <div class="plan-compare">
+      <div class="plan-col">
+        <div class="plan-col-badge badge-free">Free</div>
+        <div class="plan-col-price">¥0 <span>/ 月</span></div>
+        <div class="plan-col-items">
+          <div class="plan-col-item"><span class="ok">✓</span> レッスン3件まで</div>
+          <div class="plan-col-item"><span class="ok">✓</span> フレーズカード（5枚/回）</div>
+          <div class="plan-col-item"><span class="no">✕</span> 単語カード全カテゴリ</div>
+          <div class="plan-col-item"><span class="no">✕</span> 学習履歴・ストリーク</div>
+          <div class="plan-col-item"><span class="no">✕</span> 辞書検索（フレーズ）</div>
+          <div class="plan-col-item"><span class="no">✕</span> 復習スター機能</div>
+        </div>
+      </div>
+      <div class="plan-col pro">
+        <div class="plan-col-badge badge-pro">✦ Pro</div>
+        <div class="plan-col-price">¥??? <span>/ 月</span></div>
+        <div class="plan-col-items">
+          <div class="plan-col-item"><span class="ok">✓</span> レッスン無制限</div>
+          <div class="plan-col-item"><span class="ok">✓</span> フレーズカード無制限</div>
+          <div class="plan-col-item"><span class="ok">✓</span> 単語カード全カテゴリ</div>
+          <div class="plan-col-item"><span class="ok">✓</span> 学習履歴・ストリーク</div>
+          <div class="plan-col-item"><span class="ok">✓</span> 辞書検索（全機能）</div>
+          <div class="plan-col-item"><span class="ok">✓</span> 復習スター機能</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 現在Proのとき -->
+    <div id="plan-already-pro" style="display:none;text-align:center;padding:16px;background:var(--green-soft);border-radius:14px;margin-bottom:16px;">
+      <div style="font-size:20px;margin-bottom:6px;">✅</div>
+      <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:600;color:var(--green)">Proプラン契約中</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">すべての機能が利用できます</div>
+    </div>
+
+    <!-- Freeのとき -->
+    <div id="plan-upgrade-btn-wrap">
+      <button class="btn-upgrade-full" onclick="showToast('決済機能は準備中です')">✦ Proにアップグレード</button>
+      <div class="upgrade-note">※ 価格・決済方法は近日公開予定</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ DICT SHEET ══════════════ -->
 <div class="sheet-overlay" id="sheet-overlay" onclick="closeDict()"></div>
 <div class="dict-sheet" id="dict-sheet">
   <div class="sheet-handle-wrap">
@@ -501,202 +763,425 @@ body {
       <span class="search-icon">🔍</span>
       <input class="search-input" type="text" id="search-input" placeholder="単語・フレーズを検索..." oninput="onSearch()">
     </div>
-    <div id="dict-results"><div class="dict-empty"><div class="emoji">🔍</div>単語やフレーズを入力してください</div></div>
+    <div id="dict-results">
+      <div class="dict-empty"><div class="emoji">🔍</div>単語やフレーズを入力してください</div>
+    </div>
   </div>
 </div>
 
 <div id="toast"></div>
 
+<!-- ══════════════ BOTTOM NAV ══════════════ -->
+<nav class="bottom-nav">
+  <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
+    <span class="nav-icon">🏠</span><span class="nav-label">ホーム</span>
+  </button>
+  <button class="nav-item" id="nav-vocab" onclick="switchTab('vocab')">
+    <span class="nav-icon">🃏</span><span class="nav-label">Vocabulary</span>
+  </button>
+  <button class="nav-item" id="nav-lessons" onclick="switchTab('lessons')">
+    <span class="nav-icon">🎬</span><span class="nav-label">レッスン</span>
+  </button>
+  <button class="nav-item" id="nav-plan" onclick="switchTab('plan')">
+    <span class="nav-icon">✦</span><span class="nav-label">プラン</span>
+  </button>
+</nav>
+
 <script>
-// ── SUPABASE ──
-const SUPABASE_URL = 'https://vnzkjkyvagqnfrqsoijw.supabase.co/rest/v1/';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZuemtqa3l2YWdxbmZycXNvaWp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MTM3ODMsImV4cCI6MjA5MjA4OTc4M30.b89qi-Vy17TbFjzxpQ_0X8jFtOzq0gayWktWCZMqqa0';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// ── INIT ──
-async function init() {
-  const { data: { session } } = await sb.auth.getSession();
-  document.getElementById('loading-screen').style.display = 'none';
-  if (session) { showApp(session.user); }
-  else { document.getElementById('auth-wrapper').style.display = 'flex'; }
+// ══════════════════════════════════════════
+// SUPABASE CONFIG
+// ══════════════════════════════════════════
+const SB_URL = 'https://vnzkjkyvagqnfrqsoijw.supabase.co';
+const SB_KEY = 'sb_publishable_pCakxmFfDkTMJFjkcOdobw_5Tnt5Vmg';
+const sbH = {
+  'Content-Type': 'application/json',
+  'apikey': SB_KEY,
+  'Authorization': 'Bearer ' + SB_KEY
+};
+async function sbGet(table, params='') {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}?${params}`, { headers: sbH });
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  } catch(e) { console.warn('Supabase fetch error:', e); return []; }
 }
 
-sb.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN' && session) {
-    document.getElementById('auth-wrapper').style.display = 'none';
-    showApp(session.user);
-  }
-  if (event === 'SIGNED_OUT') {
-    document.getElementById('app-wrapper').style.display = 'none';
-    document.getElementById('auth-wrapper').style.display = 'flex';
-    showLogin();
-  }
-});
+// ══════════════════════════════════════════
+// STATE — プランはlocalStorage（開発確認用）
+// ══════════════════════════════════════════
+let currentPlan = localStorage.getItem('voz_plan') || 'free'; // 'free' | 'pro'
 
-function showApp(user) {
-  document.getElementById('app-wrapper').style.display = 'block';
-  const name = user.email.split('@')[0];
-  const initial = name.charAt(0).toUpperCase();
-  ['user-avatar','user-avatar2','user-avatar3'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = initial;
+// Supabaseから読み込んだデータ
+let sbLessons = [];
+let sbFlashcards = [];
+let sbDict = {};
+
+async function loadFromSupabase() {
+  const [lessonsRaw, fcRaw, dictRaw] = await Promise.all([
+    sbGet('lessons', 'order=date.desc'),
+    sbGet('flashcards', 'order=created.desc'),
+    sbGet('dict'),
+  ]);
+
+  // visibility でフィルタリング
+  // public → 全員
+  // members → proのみ
+  // private → 非表示
+  sbLessons = lessonsRaw
+    .filter(l => l.visibility !== 'private')
+    .map((l, i) => ({
+      id: l.id,
+      name: l.name,
+      url: l.url || '',
+      date: l.date || '',
+      visibility: l.visibility || 'members',
+      status: 'new',
+      step: 0,
+      emoji: '🎬',
+      reviewCount: 0
+    }));
+
+  sbFlashcards = fcRaw.filter(f => f.visibility !== 'private');
+
+  sbDict = {};
+  dictRaw.filter(d => d.visibility !== 'private').forEach(d => {
+    sbDict[d.es] = { ...d };
   });
-  const g = document.getElementById('greeting-name');
-  if (g) g.textContent = name;
+
   renderLessons();
+  renderVocab();
+  renderDictResults(''); // 辞書の初期化
 }
 
-// ── LOGIN ──
-async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
-  const errEl = document.getElementById('login-error');
-  const btn = document.getElementById('btn-login');
-  errEl.classList.remove('show');
-  if (!email || !password) { errEl.textContent = 'メールアドレスとパスワードを入力してください'; errEl.classList.add('show'); return; }
-  btn.classList.add('loading'); btn.disabled = true;
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  btn.classList.remove('loading'); btn.disabled = false;
-  if (error) {
-    errEl.textContent = error.message.includes('Invalid') ? 'メールアドレスまたはパスワードが違います' : error.message;
-    errEl.classList.add('show');
-  }
+function setPlan(plan) {
+  currentPlan = plan;
+  localStorage.setItem('voz_plan', plan);
+  document.getElementById('dev-free').classList.toggle('active', plan === 'free');
+  document.getElementById('dev-pro').classList.toggle('active', plan === 'pro');
+  applyPlanUI();
+  showToast(plan === 'pro' ? '✦ Proプランに切り替えました' : 'Freeプランに切り替えました');
 }
 
-// ── SIGNUP ──
-async function doSignup() {
-  const email = document.getElementById('signup-email').value.trim();
-  const password = document.getElementById('signup-password').value;
-  const password2 = document.getElementById('signup-password2').value;
-  const errEl = document.getElementById('signup-error');
-  const sucEl = document.getElementById('signup-success');
-  const btn = document.getElementById('btn-signup');
-  errEl.classList.remove('show'); sucEl.classList.remove('show');
-  if (!email || !password) { errEl.textContent = 'すべての項目を入力してください'; errEl.classList.add('show'); return; }
-  if (password.length < 6) { errEl.textContent = 'パスワードは6文字以上にしてください'; errEl.classList.add('show'); return; }
-  if (password !== password2) { errEl.textContent = 'パスワードが一致しません'; errEl.classList.add('show'); return; }
-  btn.classList.add('loading'); btn.disabled = true;
-  const { error } = await sb.auth.signUp({ email, password });
-  btn.classList.remove('loading'); btn.disabled = false;
-  if (error) {
-    errEl.textContent = error.message.includes('already') ? 'このメールアドレスはすでに登録されています' : error.message;
-    errEl.classList.add('show');
+function applyPlanUI() {
+  const isFree = currentPlan === 'free';
+  document.getElementById('free-home-banner').style.display = isFree ? 'block' : 'none';
+  document.getElementById('stat-phrases').classList.toggle('locked', isFree);
+  document.getElementById('stat-days').classList.toggle('locked', isFree);
+  document.getElementById('flash-limit-note').style.display = isFree ? 'block' : 'none';
+  if (isFree) {
+    document.getElementById('card-count').value = 5;
+    document.getElementById('card-count').max = 5;
   } else {
-    sucEl.textContent = 'アカウントを作成しました！ログインしてください 🎉';
-    sucEl.classList.add('show');
-    setTimeout(() => showLogin(), 2000);
+    document.getElementById('card-count').max = 50;
   }
+  if (!isFree) document.getElementById('category-section').classList.remove('locked');
+  document.getElementById('plan-already-pro').style.display = isFree ? 'none' : 'block';
+  document.getElementById('plan-upgrade-btn-wrap').style.display = isFree ? 'block' : 'none';
+  renderLessons();
+  document.getElementById('dev-free').classList.toggle('active', isFree);
+  document.getElementById('dev-pro').classList.toggle('active', !isFree);
 }
 
-async function doLogout() { await sb.auth.signOut(); }
+// ══════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════
+const tabs = ['home','vocab','lessons','plan'];
+let currentTab = 'home';
 
-function showLogin() {
-  document.getElementById('auth-login').style.display = 'block';
-  document.getElementById('auth-signup').style.display = 'none';
+function switchTab(tab) {
+  if (tab === currentTab) return;
+  currentTab = tab;
+  tabs.forEach(t => {
+    document.getElementById('screen-'+t).classList.toggle('active', t === tab);
+    const nav = document.getElementById('nav-'+t);
+    if (nav) nav.classList.toggle('active', t === tab);
+  });
+  window.scrollTo(0,0);
 }
-function showSignup() {
-  document.getElementById('auth-login').style.display = 'none';
-  document.getElementById('auth-signup').style.display = 'block';
-}
 
-document.addEventListener('keydown', e => {
-  if (e.key !== 'Enter') return;
-  if (document.getElementById('auth-login').style.display !== 'none') doLogin();
-  else if (document.getElementById('auth-signup').style.display !== 'none') doSignup();
-});
-
-// ── TOAST ──
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   clearTimeout(t._timer);
   t._timer = setTimeout(() => t.classList.remove('show'), 2200);
 }
-
-// ── NAV ──
-const tabs = ['home','vocab','lessons'];
-let currentTab = 'home';
-function switchTab(tab) {
-  if (tab === currentTab) return;
-  currentTab = tab;
-  tabs.forEach(t => {
-    document.getElementById('screen-'+t).classList.toggle('active', t===tab);
-    document.getElementById('nav-'+t).classList.toggle('active', t===tab);
-  });
-  window.scrollTo(0,0);
+function showLockedMsg() {
+  if (currentPlan === 'free') showToast('🔒 このレッスンはProプラン限定です');
 }
 
-// ── VOCAB DATA ──
-const vocab = [
-  {es:'hacer que',jp:'〜させる・〜するようにする',type:'phrase',lessons:['Bluey Ep3-1','Bluey Ep2-4']},
-  {es:'se me pase',jp:'（気分・痛みが）治る・過ぎ去る',type:'phrase',lessons:['Bluey Ep3-1']},
-  {es:'por un rato',jp:'少しの間',type:'phrase',lessons:['Bluey Ep3-2','Bluey Ep3-1']},
-  {es:'a ver',jp:'ちょっと見せて・さあ',type:'phrase',lessons:['Bluey Ep2-4','Bluey Ep2-3']},
-  {es:'dale',jp:'どうぞ・いいよ・やって',type:'phrase',lessons:['Bluey Ep3-2']},
-  {es:'tener ganas',jp:'〜したい気持ちがある',type:'phrase',lessons:['Bluey Ep2-3']},
-  {es:'en serio',jp:'本当に・マジで',type:'phrase',lessons:['Bluey Ep3-1','Bluey Ep2-3']},
-  {es:'la silla',jp:'椅子',type:'word',cat:'furniture',lessons:[]},
-  {es:'la mesa',jp:'テーブル',type:'word',cat:'furniture',lessons:[]},
-  {es:'el sofá',jp:'ソファ',type:'word',cat:'furniture',lessons:[]},
-  {es:'la comida',jp:'食べ物・料理',type:'word',cat:'food',lessons:['Bluey Ep2-4']},
-  {es:'el desayuno',jp:'朝食',type:'word',cat:'food',lessons:[]},
-  {es:'el aeropuerto',jp:'空港',type:'word',cat:'travel',lessons:[]},
-  {es:'el parque',jp:'公園',type:'word',cat:'place',lessons:['Bluey Ep3-2']},
-];
+// ══════════════════════════════════════════
+// STREAK
+// ══════════════════════════════════════════
+function renderStreak() {
+  const days = ['月','火','水','木','金','土','日'];
+  const todayIdx = (new Date().getDay() + 6) % 7;
+  const streakCount = 7;
+  const streakEl = document.getElementById('streak-days');
+  streakEl.innerHTML = days.map((d,i) => {
+    const isToday = i === todayIdx;
+    const isDone  = !isToday && ((todayIdx - i + 7) % 7) < streakCount;
+    const cls = isToday ? 'today' : isDone ? 'done' : '';
+    return `<div class="streak-day ${cls}"><div class="dot"></div><span>${d}</span></div>`;
+  }).join('');
+}
 
-function openDict() { document.getElementById('dict-sheet').classList.add('show'); document.getElementById('sheet-overlay').classList.add('show'); setTimeout(()=>document.getElementById('search-input').focus(),400); }
-function closeDict() { document.getElementById('dict-sheet').classList.remove('show'); document.getElementById('sheet-overlay').classList.remove('show'); }
+// ══════════════════════════════════════════
+// VOCAB DATA — Supabaseから読み込み
+// ══════════════════════════════════════════
+// sbFlashcards と sbDict はloadFromSupabaseで設定される
+// ここでは vocab ビルダーを定義（フラッシュカード用）
+function buildVocabPool() {
+  // sbFlashcards: {id, jp, es, memo, visibility}
+  // visibility=public は全員、members はPro、private は非表示（load時に除外済み）
+  return sbFlashcards.map(f => ({
+    es: f.es, jp: f.jp, type: 'phrase', cat: 'phrase',
+    visibility: f.visibility || 'members',
+    lessons: []
+  }));
+}
+
+function renderVocab() {
+  // 必要に応じて vocab 画面を再描画
+}
+
+// ── DICT ──
+function openDict() {
+  document.getElementById('dict-sheet').classList.add('show');
+  document.getElementById('sheet-overlay').classList.add('show');
+  setTimeout(() => document.getElementById('search-input').focus(), 400);
+}
+function closeDict() {
+  document.getElementById('dict-sheet').classList.remove('show');
+  document.getElementById('sheet-overlay').classList.remove('show');
+}
+function renderDictResults(q) {
+  const container = document.getElementById('dict-results');
+  if (!q) { container.innerHTML = `<div class="dict-empty"><div class="emoji">🔍</div>単語やフレーズを入力してください</div>`; return; }
+  // sbDict: {es: {es, jp, pos, example, trivia, visibility}}
+  const allEntries = Object.values(sbDict);
+  let pool = currentPlan === 'free'
+    ? allEntries.filter(d => d.visibility === 'public')
+    : allEntries;
+  const results = pool.filter(d =>
+    (d.es||'').toLowerCase().includes(q.toLowerCase()) || (d.jp||'').includes(q)
+  );
+  if (!results.length) {
+    const msg = currentPlan === 'free'
+      ? '😶 見つかりません。<br><small style="color:var(--muted)">辞書全検索はProプランで</small>'
+      : `😶「${q}」は見つかりませんでした`;
+    container.innerHTML = `<div class="dict-empty"><div class="emoji">😶</div>${msg}</div>`;
+    return;
+  }
+  container.innerHTML = results.map(d => `
+    <div class="dict-item">
+      <div class="dict-item-top">
+        <div class="dict-item-es">${d.es||''}</div>
+        ${d.pos ? `<span class="dict-item-type type-word">${d.pos}</span>` : ''}
+      </div>
+      <div class="dict-item-jp">${d.jp||''}</div>
+      ${d.example ? `<div style="font-size:11px;color:var(--muted);margin-top:4px">例: ${d.example}</div>` : ''}
+    </div>
+  `).join('');
+}
 function onSearch() {
-  const q = document.getElementById('search-input').value.trim().toLowerCase();
-  const c = document.getElementById('dict-results');
-  if (!q) { c.innerHTML=`<div class="dict-empty"><div class="emoji">🔍</div>単語やフレーズを入力してください</div>`; return; }
-  const r = vocab.filter(v=>v.es.toLowerCase().includes(q)||v.jp.includes(q));
-  if (!r.length) { c.innerHTML=`<div class="dict-empty"><div class="emoji">😶</div>「${q}」は見つかりませんでした</div>`; return; }
-  c.innerHTML=r.map(v=>`<div class="dict-item"><div class="dict-item-top"><div class="dict-item-es">${v.es}</div><span class="dict-item-type ${v.type==='phrase'?'type-phrase':'type-word'}">${v.type==='phrase'?'フレーズ':'単語'}</span></div><div class="dict-item-jp">${v.jp}</div>${v.lessons.length?`<div class="dict-item-lessons">${v.lessons.map(l=>`<span class="lesson-chip">📖 ${l}</span>`).join('')}</div>`:''}</div>`).join('');
+  const q = document.getElementById('search-input').value.trim();
+  renderDictResults(q);
 }
 
-let flashMode='phrase',flashDir='es',flashCats=['all'];
-function selectMode(m){flashMode=m;document.getElementById('mode-phrase').classList.toggle('selected',m==='phrase');document.getElementById('mode-word').classList.toggle('selected',m==='word');document.getElementById('category-section').style.display=m==='word'?'block':'none';}
-function toggleCat(cat,el){if(cat==='all'){flashCats=['all'];document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');return;}flashCats=flashCats.filter(c=>c!=='all');document.querySelector('.all-chip').classList.remove('selected');if(flashCats.includes(cat)){flashCats=flashCats.filter(c=>c!==cat);el.classList.remove('selected');}else{flashCats.push(cat);el.classList.add('selected');}if(!flashCats.length){flashCats=['all'];document.querySelector('.all-chip').classList.add('selected');}}
-function setDir(d){flashDir=d;document.getElementById('dir-es').classList.toggle('active',d==='es');document.getElementById('dir-jp').classList.toggle('active',d==='jp');}
+// ── FLASHCARD ──
+let flashMode = 'phrase', flashDir = 'es', flashCats = ['all'];
+let deck = [], deckIdx = 0, correctCount = 0, wrongCount = 0, wrongCards = [], isFlipped = false;
 
-let deck=[],deckIdx=0,correctCount=0,wrongCount=0,wrongCards=[],isFlipped=false;
-function startFlash(){let pool=vocab.filter(v=>{if(flashMode==='phrase')return v.type==='phrase';if(flashCats.includes('all'))return v.type==='word';return v.type==='word'&&flashCats.includes(v.cat);});pool=pool.sort(()=>Math.random()-.5);const count=Math.min(parseInt(document.getElementById('card-count').value)||10,pool.length);deck=pool.slice(0,count);deckIdx=0;correctCount=0;wrongCount=0;wrongCards=[];document.getElementById('flash-setup').style.display='none';document.getElementById('flash-game').style.display='block';document.getElementById('flash-result').style.display='none';showCard();}
-function showCard(){if(deckIdx>=deck.length){showResult();return;}const card=deck[deckIdx];isFlipped=false;document.getElementById('flip-card').classList.remove('flipped');document.getElementById('judge-btns').classList.add('hidden');document.getElementById('front-hint').textContent=flashDir==='es'?'スペイン語':'日本語';document.getElementById('front-main').textContent=flashDir==='es'?card.es:card.jp;document.getElementById('back-hint').textContent=flashDir==='es'?'日本語':'スペイン語';document.getElementById('back-main').textContent=flashDir==='es'?card.jp:card.es;document.getElementById('back-sub').textContent=flashDir==='es'?card.es:card.jp;document.getElementById('flash-fill').style.width=(deckIdx/deck.length*100)+'%';document.getElementById('flash-progress-text').textContent=`${deckIdx+1} / ${deck.length}`;document.getElementById('flash-score-text').innerHTML=`✅ ${correctCount} &nbsp; ❌ ${wrongCount}`;}
-function flipCard(){if(isFlipped)return;isFlipped=true;document.getElementById('flip-card').classList.add('flipped');setTimeout(()=>document.getElementById('judge-btns').classList.remove('hidden'),300);}
-function judge(ok){if(ok)correctCount++;else{wrongCount++;wrongCards.push(deck[deckIdx]);}deckIdx++;showCard();}
-function showResult(){document.getElementById('flash-game').style.display='none';document.getElementById('flash-result').style.display='block';document.getElementById('result-correct').textContent=correctCount;document.getElementById('result-wrong').textContent=wrongCount;document.getElementById('flash-fill').style.width='100%';document.querySelector('.btn-retry').style.display=wrongCards.length?'flex':'none';}
-function retryWrong(){deck=wrongCards.sort(()=>Math.random()-.5);deckIdx=0;correctCount=0;wrongCount=0;wrongCards=[];document.getElementById('flash-result').style.display='none';document.getElementById('flash-game').style.display='block';showCard();}
-function backToSetup(){document.getElementById('flash-result').style.display='none';document.getElementById('flash-game').style.display='none';document.getElementById('flash-setup').style.display='block';}
-
-// ── LESSONS ──
-const lessons=[
-  {id:1,name:'Bluey Ep3-2',date:'2026.04.20',status:'wip',step:3,emoji:'🎬',reviewCount:0},
-  {id:2,name:'Bluey Ep3-1',date:'2026.04.15',status:'done',step:5,emoji:'🎬',reviewCount:2},
-  {id:3,name:'Bluey Ep2-4',date:'2026.04.10',status:'done',step:5,emoji:'🎬',reviewCount:3},
-  {id:4,name:'Bluey Ep2-3',date:'2026.04.05',status:'done',step:5,emoji:'🎬',reviewCount:1},
-  {id:5,name:'Bluey Ep3-3',date:'2026.04.22',status:'new',step:0,emoji:'🎬',reviewCount:0},
-  {id:6,name:'Bluey Ep3-4',date:'2026.04.22',status:'new',step:0,emoji:'🎬',reviewCount:0},
-];
-const ACTION_LABEL={done:'復習する',wip:'再開する',new:'始める'};
-const STEPS=5,MAX_STARS=3;
-let currentView='list',currentFilter='all';
-function starsHTML(n){return Array.from({length:MAX_STARS},(_,i)=>`<span class="star ${i<n?'filled':'empty'}">⭐</span>`).join('');}
-function onAction(id){const l=lessons.find(x=>x.id===id);if(!l)return;if(l.status==='done'&&l.reviewCount<MAX_STARS){l.reviewCount++;renderLessons();showToast(`⭐ ${l.name}の復習 ${l.reviewCount}回目！`);}else{showToast(`「${l.name}」を${ACTION_LABEL[l.status]}...`);}}
-function setView(v){currentView=v;document.getElementById('btn-card').classList.toggle('active',v==='card');document.getElementById('btn-list').classList.toggle('active',v==='list');renderLessons();}
-function setFilter(f,el){currentFilter=f;document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderLessons();}
-function progressDots(step,status,cls){return Array.from({length:STEPS},(_,i)=>{let c='';if(status==='done')c='done';else if(i<step)c='done';else if(i===step)c='active';return`<div class="${cls} ${c}"></div>`;}).join('');}
-function stepLabel(step,status){if(status==='done')return'全ステップ完了';if(status==='new')return'未開始';const n=['Escuchar','Dictado','Entender','Reconstruir','Imitar'];return`${n[step]||''} まで完了`;}
-function renderLessons(){
-  const filtered=currentFilter==='all'?lessons:lessons.filter(l=>l.status===currentFilter);
-  document.getElementById('count-label').textContent=`${filtered.length}件`;
-  const c=document.getElementById('lessons-container');
-  if(!filtered.length){c.innerHTML=`<div class="empty-msg"><div class="emoji">📭</div>該当するレッスンがありません</div>`;return;}
-  if(currentView==='card'){c.innerHTML=`<div class="card-grid">${filtered.map(l=>`<div class="lesson-card-item"><div class="lesson-card-thumb ${l.status}">${l.emoji}<div class="status-pip pip-${l.status}"></div></div><div class="lesson-card-body"><div class="lesson-card-name">${l.name}</div>${l.status==='done'?`<div class="lesson-stars">${starsHTML(l.reviewCount)}</div>`:''}<div class="lesson-card-meta">${l.date}</div><div class="lesson-card-progress">${progressDots(l.step,l.status,'lcp')}</div><button class="btn-card-action ${l.status}" onclick="onAction(${l.id})">${ACTION_LABEL[l.status]}</button></div></div>`).join('')}</div>`;}
-  else{c.innerHTML=filtered.map(l=>`<div class="lesson-list-item"><div class="lesson-list-icon ${l.status}">${l.emoji}</div><div class="lesson-list-info"><div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;"><div class="lesson-list-name" style="margin-bottom:0">${l.name}</div>${l.status==='done'?`<div class="lesson-stars">${starsHTML(l.reviewCount)}</div>`:''}</div><div class="lesson-list-meta">${stepLabel(l.step,l.status)}</div><div class="lesson-list-progress">${progressDots(l.step,l.status,'llp')}</div></div><button class="btn-list-action ${l.status}" onclick="onAction(${l.id})">${ACTION_LABEL[l.status]}</button></div>`).join('');}
+function selectMode(mode) {
+  if (mode === 'word' && currentPlan === 'free') {
+    showToast('🔒 単語モードはProプラン限定です');
+    return;
+  }
+  flashMode = mode;
+  document.getElementById('mode-phrase').classList.toggle('selected', mode==='phrase');
+  document.getElementById('mode-word').classList.toggle('selected', mode==='word');
+  document.getElementById('category-section').style.display = mode==='word' ? 'block' : 'none';
+}
+function toggleCat(cat, el) {
+  if (currentPlan === 'free') { showToast('🔒 カテゴリ選択はProプラン限定です'); return; }
+  if (cat==='all') { flashCats=['all']; document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); return; }
+  flashCats = flashCats.filter(c=>c!=='all'); document.querySelector('.all-chip').classList.remove('selected');
+  if (flashCats.includes(cat)) { flashCats=flashCats.filter(c=>c!==cat); el.classList.remove('selected'); }
+  else { flashCats.push(cat); el.classList.add('selected'); }
+  if (!flashCats.length) { flashCats=['all']; document.querySelector('.all-chip').classList.add('selected'); }
+}
+function setDir(dir) {
+  flashDir = dir;
+  document.getElementById('dir-es').classList.toggle('active', dir==='es');
+  document.getElementById('dir-jp').classList.toggle('active', dir==='jp');
+}
+function startFlash() {
+  const pool = buildVocabPool().filter(v => {
+    if (currentPlan === 'free') return v.visibility === 'public';
+    return true; // pro は全部見れる
+  }).sort(()=>Math.random()-.5);
+  const maxCards = currentPlan === 'free' ? 5 : 50;
+  const count = Math.min(parseInt(document.getElementById('card-count').value)||5, pool.length, maxCards);
+  if (!count) { showToast('表示できるカードがありません'); return; }
+  deck = pool.slice(0,count);
+  deckIdx=0; correctCount=0; wrongCount=0; wrongCards=[];
+  document.getElementById('flash-setup').style.display='none';
+  document.getElementById('flash-game').style.display='block';
+  document.getElementById('flash-result').style.display='none';
+  showCard();
+}
+function showCard() {
+  if (deckIdx>=deck.length) { showResult(); return; }
+  const card = deck[deckIdx]; isFlipped = false;
+  document.getElementById('flip-card').classList.remove('flipped');
+  document.getElementById('judge-btns').classList.add('hidden');
+  document.getElementById('front-hint').textContent = flashDir==='es'?'スペイン語':'日本語';
+  document.getElementById('front-main').textContent = flashDir==='es'?card.es:card.jp;
+  document.getElementById('back-hint').textContent  = flashDir==='es'?'日本語':'スペイン語';
+  document.getElementById('back-main').textContent  = flashDir==='es'?card.jp:card.es;
+  document.getElementById('back-sub').textContent   = flashDir==='es'?card.es:card.jp;
+  const pct = (deckIdx/deck.length)*100;
+  document.getElementById('flash-fill').style.width = pct+'%';
+  document.getElementById('flash-progress-text').textContent = `${deckIdx+1} / ${deck.length}`;
+  document.getElementById('flash-score-text').innerHTML = `✅ ${correctCount} &nbsp; ❌ ${wrongCount}`;
+}
+function flipCard() {
+  if (isFlipped) return; isFlipped=true;
+  document.getElementById('flip-card').classList.add('flipped');
+  setTimeout(()=>document.getElementById('judge-btns').classList.remove('hidden'),300);
+}
+function judge(correct) {
+  if (correct) correctCount++; else { wrongCount++; wrongCards.push(deck[deckIdx]); }
+  deckIdx++; showCard();
+}
+function showResult() {
+  document.getElementById('flash-game').style.display='none';
+  document.getElementById('flash-result').style.display='block';
+  document.getElementById('result-correct').textContent=correctCount;
+  document.getElementById('result-wrong').textContent=wrongCount;
+  document.getElementById('flash-fill').style.width='100%';
+  document.querySelector('.btn-retry').style.display = wrongCards.length?'flex':'none';
+}
+function retryWrong() {
+  deck=wrongCards.sort(()=>Math.random()-.5); deckIdx=0; correctCount=0; wrongCount=0; wrongCards=[];
+  document.getElementById('flash-result').style.display='none';
+  document.getElementById('flash-game').style.display='block';
+  showCard();
+}
+function backToSetup() {
+  document.getElementById('flash-result').style.display='none';
+  document.getElementById('flash-game').style.display='none';
+  document.getElementById('flash-setup').style.display='block';
 }
 
-init();
+// ══════════════════════════════════════════
+// LESSONS — Supabaseから読み込み
+// ══════════════════════════════════════════
+// FREE_LESSON_LIMIT: Freeで使えるレッスン数（無料公開レッスンは除外）
+const FREE_LESSON_LIMIT = 3;
+const ACTION_LABEL = { done:'復習する', wip:'再開する', new:'始める', locked:'🔒 Pro限定' };
+const STEPS = 5, MAX_STARS = 3;
+let currentView = 'list', currentFilter = 'all';
+
+// isLocked: freeかつmembers限定かつFREE_LESSON_LIMIT超え
+function isLocked(lesson) {
+  if (lesson.visibility === 'public') return false; // 無料公開は常にアクセス可
+  return currentPlan === 'free';
+}
+function starsHTML(count) {
+  return Array.from({length:MAX_STARS},(_,i)=>`<span class="star ${i<count?'filled':'empty'}">⭐</span>`).join('');
+}
+function onAction(lessonId) {
+  const lesson = sbLessons.find(l=>l.id===lessonId);
+  if (!lesson) return;
+  if (isLocked(lesson)) { showToast('🔒 このレッスンはProプラン限定です'); switchTab('plan'); return; }
+  if (lesson.url) { window.open(lesson.url, '_blank'); return; }
+  showToast(`「${lesson.name}」を開けませんでした`);
+}
+function setView(v) {
+  currentView=v;
+  document.getElementById('btn-card').classList.toggle('active',v==='card');
+  document.getElementById('btn-list').classList.toggle('active',v==='list');
+  renderLessons();
+}
+function setFilter(f,el) {
+  currentFilter=f;
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active'); renderLessons();
+}
+function progressDots(step,status,cls) {
+  return Array.from({length:STEPS},(_,i)=>{
+    let c='';
+    if (status==='done') c='done'; else if (i<step) c='done'; else if (i===step) c='active';
+    return `<div class="${cls} ${c}"></div>`;
+  }).join('');
+}
+function stepLabel(step,status) {
+  if (status==='done') return '全ステップ完了';
+  if (status==='new') return '未開始';
+  const names=['Escuchar','Dictado','Entender','Reconstruir','Imitar'];
+  return `${names[step]||''} まで完了`;
+}
+function renderLessons() {
+  const lessons = sbLessons;
+  const filtered = currentFilter==='all' ? lessons : lessons.filter(l=>l.status===currentFilter);
+  const countEl = document.getElementById('count-label');
+  if (countEl) countEl.textContent = `${filtered.length}件`;
+  const container = document.getElementById('lessons-container');
+  if (!container) return;
+
+  if (!filtered.length) {
+    container.innerHTML=`<div class="empty-msg"><div class="emoji">📭</div>${lessons.length ? '該当するレッスンがありません' : '読み込み中...'}</div>`;
+    return;
+  }
+
+  if (currentView==='card') {
+    container.innerHTML = `<div class="card-grid">${filtered.map(l=>{
+      const locked = isLocked(l);
+      const st = locked ? 'locked' : l.status;
+      const badge = l.visibility==='public' ? '<span style="font-size:9px;background:var(--green-soft);color:var(--green);border-radius:4px;padding:1px 5px;margin-left:4px">無料</span>' : '';
+      return `<div class="lesson-card-item" onclick="onAction('${l.id}')">
+        <div class="lesson-card-thumb ${st}">${locked?'🔒':l.emoji}${!locked?`<div class="status-pip pip-${l.status}"></div>`:''}
+        </div>
+        <div class="lesson-card-body">
+          <div class="lesson-card-name">${l.name}${badge}</div>
+          ${l.status==='done'&&!locked?`<div class="lesson-stars">${starsHTML(l.reviewCount)}</div>`:''}
+          <div class="lesson-card-meta">${locked?'Pro限定':l.date}</div>
+          <div class="lesson-card-progress">${progressDots(l.step,l.status,'lcp')}</div>
+          <button class="btn-card-action ${st}">${locked?'🔒 Pro限定':ACTION_LABEL[l.status]}</button>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  } else {
+    container.innerHTML = filtered.map(l=>{
+      const locked = isLocked(l);
+      const st = locked ? 'locked' : l.status;
+      const badge = l.visibility==='public' ? '<span style="font-size:9px;background:var(--green-soft);color:var(--green);border-radius:4px;padding:1px 5px;margin-left:4px">無料</span>' : '';
+      return `<div class="lesson-list-item ${locked?'is-locked':''}" onclick="onAction('${l.id}')">
+        <div class="lesson-list-icon ${st}">${locked?'🔒':l.emoji}</div>
+        <div class="lesson-list-info">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <div class="lesson-list-name" style="margin-bottom:0">${l.name}${badge}</div>
+            ${l.status==='done'&&!locked?`<div class="lesson-stars" style="margin-bottom:0">${starsHTML(l.reviewCount)}</div>`:''}
+          </div>
+          <div class="lesson-list-meta">${locked?'Pro限定':stepLabel(l.step,l.status)}</div>
+          <div class="lesson-list-progress">${progressDots(l.step,l.status,'llp')}</div>
+        </div>
+        <button class="btn-list-action ${st}" onclick="event.stopPropagation();onAction('${l.id}')">${locked?'🔒 Pro':ACTION_LABEL[l.status]}</button>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+renderStreak();
+applyPlanUI();
+loadFromSupabase(); // Supabaseからデータを読み込んで反映
 </script>
 </body>
 </html>
