@@ -466,9 +466,11 @@ body {
 
 /* ── LOGIN SCREEN ── */
 #screen-login {
-  display: none; min-height: 100vh; padding-bottom: 0;
+  display: none;
+  position: fixed; inset: 0; z-index: 1000;
   background: var(--bg);
-  align-items: center; justify-content: center; flex-direction: column;
+  overflow-y: auto;
+  align-items: flex-start; justify-content: center; flex-direction: column;
 }
 #screen-login.active { display: flex; }
 .login-wrap {
