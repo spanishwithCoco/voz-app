@@ -464,175 +464,32 @@ body {
 }
 #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-/* ── LOGIN SCREEN ── */
-#screen-login {
-  display: none;
-  position: fixed; inset: 0; z-index: 1000;
-  background: var(--bg);
-  overflow-y: auto;
-  align-items: flex-start; justify-content: center; flex-direction: column;
+/* ── PLAN SWITCHER (dev only) ── */
+.dev-switcher {
+  position: fixed; top: 70px; right: 12px; z-index: 300;
+  background: var(--text); border-radius: 12px; padding: 8px 12px;
+  display: flex; gap: 6px; align-items: center;
+  box-shadow: var(--shadow-lg);
 }
-#screen-login.active { display: flex; }
-.login-wrap {
-  width: 100%; max-width: 380px; padding: 32px 24px 40px;
-}
-.login-logo {
-  font-family: 'Fraunces', serif; font-size: 38px; font-weight: 700;
-  color: var(--accent); letter-spacing: -1px; margin-bottom: 4px;
-}
-.login-tagline {
-  font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace;
-  margin-bottom: 40px; line-height: 1.6;
-}
-.login-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 20px; padding: 28px 24px; box-shadow: var(--shadow-lg);
-}
-.login-title {
-  font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600;
-  color: var(--text); margin-bottom: 6px;
-}
-.login-sub {
-  font-size: 12px; color: var(--muted); margin-bottom: 24px; line-height: 1.6;
-}
-.login-field { margin-bottom: 14px; }
-.login-label {
-  font-size: 11px; font-weight: 600; color: var(--muted);
-  font-family: 'Space Mono', monospace; text-transform: uppercase;
-  letter-spacing: .05em; display: block; margin-bottom: 6px;
-}
-.login-input {
-  width: 100%; padding: 12px 14px;
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 12px; font-family: 'DM Sans', sans-serif;
-  font-size: 15px; color: var(--text); outline: none;
-  transition: border-color .18s;
-}
-.login-input:focus { border-color: var(--accent); background: var(--surface); }
-.login-error {
-  font-size: 12px; color: var(--red); margin-bottom: 12px;
-  padding: 8px 12px; background: var(--red-soft);
-  border-radius: 8px; display: none;
-}
-.login-error.show { display: block; }
-.btn-login {
-  width: 100%; padding: 14px; background: var(--accent); color: #fff;
-  border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif;
-  font-weight: 700; font-size: 15px; cursor: pointer; transition: all .2s;
-  box-shadow: 0 4px 18px rgba(200,96,26,.3); margin-top: 4px;
-}
-.btn-login:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(200,96,26,.4); }
-.btn-login:disabled { opacity: .6; cursor: not-allowed; transform: none; }
-.login-toggle {
-  text-align: center; margin-top: 16px; font-size: 13px; color: var(--muted);
-}
-.login-toggle a { color: var(--accent); cursor: pointer; font-weight: 600; text-decoration: none; }
-
-/* ── LESSON VIEWER SCREEN ── */
-#screen-lesson-view {
-  display: none; position: fixed; inset: 0; z-index: 500;
-  background: var(--bg); flex-direction: column;
-}
-#screen-lesson-view.active { display: flex; }
-.lesson-view-bar {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 16px; background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.lesson-view-back {
-  background: none; border: none; font-size: 20px; cursor: pointer;
-  padding: 4px 8px; border-radius: 8px; transition: background .15s;
-  color: var(--text); flex-shrink: 0;
-}
-.lesson-view-back:hover { background: var(--surface2); }
-.lesson-view-title {
-  font-family: 'Fraunces', serif; font-size: 16px; font-weight: 600;
-  color: var(--text); flex: 1; min-width: 0;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.lesson-view-iframe {
-  flex: 1; border: none; width: 100%;
-  background: var(--bg);
-}
-.lesson-loading {
-  position: absolute; inset: 60px 0 0 0;
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column; gap: 12px; color: var(--muted);
-  font-size: 13px; pointer-events: none;
-}
-.lesson-loading-spinner {
-  width: 32px; height: 32px; border: 3px solid var(--border);
-  border-top-color: var(--accent); border-radius: 50%;
-  animation: spin .7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+.dev-label { font-size: 9px; color: rgba(255,255,255,.5); font-family: 'Space Mono', monospace; white-space: nowrap; }
+.dev-btn { padding: 4px 10px; border: none; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all .15s; background: rgba(255,255,255,.1); color: rgba(255,255,255,.6); font-family: 'DM Sans', sans-serif; }
+.dev-btn.active { background: var(--accent); color: #fff; }
 </style>
 </head>
 <body>
 
-<!-- ══════════════ LOGIN SCREEN ══════════════ -->
-<div id="screen-login" class="active">
-  <div class="login-wrap">
-    <div class="login-logo">VOZ.</div>
-    <div class="login-tagline">escucha, copia, hazlo tu voz.</div>
-    <div class="login-card">
-      <div class="login-title" id="login-card-title">ログイン</div>
-      <div class="login-sub" id="login-card-sub">メールアドレスとパスワードを入力してください</div>
-      <div class="login-error" id="login-error"></div>
-      <div class="login-field">
-        <label class="login-label">メールアドレス</label>
-        <input class="login-input" type="email" id="login-email" placeholder="your@email.com" autocomplete="email">
-      </div>
-      <div class="login-field">
-        <label class="login-label">パスワード</label>
-        <input class="login-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
-      </div>
-      <!-- サインアップ時のみ表示 -->
-      <div class="login-field" id="signup-name-field" style="display:none">
-        <label class="login-label">お名前（表示名）</label>
-        <input class="login-input" type="text" id="login-name" placeholder="例：Yuki">
-      </div>
-      <button class="btn-login" id="btn-login-submit" onclick="submitAuth()">ログイン</button>
-      <div class="login-toggle">
-        <span id="login-toggle-text">アカウントをお持ちでない方は</span>
-        <a onclick="toggleAuthMode()">こちら</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ LESSON VIEWER ══════════════ -->
-<div id="screen-lesson-view">
-  <div class="lesson-view-bar">
-    <button class="lesson-view-back" onclick="closeLessonView()">←</button>
-    <div class="lesson-view-title" id="lesson-view-title">レッスン</div>
-  </div>
-  <div style="position:relative;flex:1;display:flex;flex-direction:column">
-    <div class="lesson-loading" id="lesson-loading">
-      <div class="lesson-loading-spinner"></div>
-      <span>読み込み中...</span>
-    </div>
-    <iframe class="lesson-view-iframe" id="lesson-iframe"
-      onload="document.getElementById('lesson-loading').style.display='none'">
-    </iframe>
-  </div>
+<!-- ══════════════ DEV PLAN SWITCHER (開発確認用) ══════════════ -->
+<div class="dev-switcher">
+  <span class="dev-label">プラン確認：</span>
+  <button class="dev-btn active" id="dev-free" onclick="setPlan('free')">Free</button>
+  <button class="dev-btn" id="dev-pro" onclick="setPlan('pro')">Pro</button>
 </div>
 
 <!-- ══════════════ HOME ══════════════ -->
 <div class="screen active" id="screen-home">
   <div class="top-bar">
     <div class="top-bar-logo">VOZ.<span>escucha, copia, hazlo tu voz.</span></div>
-    <div class="user-dot" id="user-dot-home" onclick="toggleUserMenu()" title="アカウント">?</div>
-  </div>
-  <!-- ユーザーメニュー -->
-  <div id="user-menu" style="display:none;position:fixed;top:60px;right:16px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-lg);padding:8px;min-width:160px">
-    <div style="padding:8px 12px 10px;border-bottom:1px solid var(--border);margin-bottom:4px">
-      <div style="font-size:11px;color:var(--muted);font-family:'Space Mono',monospace">ログイン中</div>
-      <div id="user-menu-email" style="font-size:12px;color:var(--text);font-weight:600;margin-top:2px;word-break:break-all"></div>
-    </div>
-    <button onclick="handleLogout()" style="width:100%;padding:8px 12px;border:none;background:none;text-align:left;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--red);cursor:pointer;border-radius:8px;transition:background .15s" onmouseover="this.style.background='var(--red-soft)'" onmouseout="this.style.background='none'">🚪 ログアウト</button>
-  </div>
+    <div class="user-dot" onclick="switchTab('plan')" title="プランを見る">Y</div>
   </div>
   <div class="main">
     <div class="greeting">
@@ -680,7 +537,11 @@ body {
     <div class="top-bar-logo compact">VOZ.</div>
     <div class="top-bar-right">
       <button class="dict-btn" onclick="openDict()">🔍 辞書</button>
-      <div class="user-dot" id="user-dot-vocab" onclick="toggleUserMenu()">?</div>
+      <div class="user-dot" onclick="switchTab('plan')">Y</div>
+    </div>
+  </div>
+  <div class="main">
+    <div id="view-flash">
       <div id="flash-setup">
         <div class="section-label" style="margin-bottom:10px">モードを選ぶ</div>
         <div class="flash-modes">
@@ -770,7 +631,11 @@ body {
 <div class="screen" id="screen-lessons">
   <div class="top-bar">
     <div class="top-bar-logo compact">VOZ.</div>
-    <div class="user-dot" id="user-dot-lessons" onclick="toggleUserMenu()">?</div>
+    <div class="user-dot" onclick="switchTab('plan')">Y</div>
+  </div>
+  <div class="main">
+    <div class="page-header">
+      <div class="page-title">レッスン</div>
       <div class="page-count" id="count-label">全6件</div>
     </div>
     <div class="view-toggle">
@@ -791,7 +656,10 @@ body {
 <div class="screen" id="screen-plan">
   <div class="top-bar">
     <div class="top-bar-logo compact">VOZ.</div>
-    <div class="user-dot" id="user-dot-plan" onclick="toggleUserMenu()">?</div>
+    <div class="user-dot">Y</div>
+  </div>
+  <div class="main">
+    <!-- フリープランバナー（Proでは非表示） -->
     <div class="plan-banner" id="free-home-banner">
       <div class="plan-badge">✦ Free プラン</div>
       <div class="plan-title">Proにアップグレードしよう</div>
@@ -895,294 +763,117 @@ body {
 // ══════════════════════════════════════════
 const SB_URL = 'https://vnzkjkyvagqnfrqsoijw.supabase.co';
 const SB_KEY = 'sb_publishable_pCakxmFfDkTMJFjkcOdobw_5Tnt5Vmg';
-
-// Supabase REST helpers
-function sbHeaders(token) {
-  return {
-    'Content-Type': 'application/json',
-    'apikey': SB_KEY,
-    'Authorization': 'Bearer ' + (token || SB_KEY)
-  };
-}
-async function sbGet(table, params='', token) {
+const sbH = {
+  'Content-Type': 'application/json',
+  'apikey': SB_KEY,
+  'Authorization': 'Bearer ' + SB_KEY
+};
+async function sbGet(table, params='') {
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/${table}?${params}`, { headers: sbHeaders(token) });
+    const r = await fetch(`${SB_URL}/rest/v1/${table}?${params}`, { headers: sbH });
     if (!r.ok) throw new Error(await r.text());
     return r.json();
   } catch(e) { console.warn('Supabase fetch error:', e); return []; }
 }
 
 // ══════════════════════════════════════════
-// AUTH STATE
+// STATE — プランはlocalStorage（開発確認用）
 // ══════════════════════════════════════════
-let _session = null;   // { access_token, user: { id, email, user_metadata } }
-let _isSignup = false;
+let currentPlan = localStorage.getItem('voz_plan') || 'free'; // 'free' | 'pro'
 
-// ページ読み込み時：セッション確認
-async function initAuth() {
-  const saved = localStorage.getItem('voz_session');
-  if (saved) {
-    try {
-      const sess = JSON.parse(saved);
-      // トークンの有効期限確認（expires_at は秒単位のunixtime）
-      if (sess.expires_at && Date.now() / 1000 < sess.expires_at) {
-        _session = sess;
-        await onLoginSuccess();
-        return;
-      }
-    } catch(e) {}
-  }
-  // セッションなし → ログイン画面
-  showLoginScreen();
-}
-
-function showLoginScreen() {
-  document.getElementById('screen-login').classList.add('active');
-  document.getElementById('screen-home').classList.remove('active');
-  document.querySelector('.bottom-nav').style.display = 'none';
-}
-
-async function onLoginSuccess() {
-  // ユーザー情報をUIに反映
-  const user = _session.user;
-  const name = user.user_metadata?.display_name || user.email?.split('@')[0] || '?';
-  const initial = name.charAt(0).toUpperCase();
-  document.querySelectorAll('.user-dot').forEach(d => d.textContent = initial);
-  document.getElementById('user-menu-email').textContent = user.email || '';
-
-  // ログイン画面を隠してアプリ本体へ
-  document.getElementById('screen-login').classList.remove('active');
-  document.getElementById('screen-home').classList.add('active');
-  document.querySelector('.bottom-nav').style.display = '';
-
-  // プランをSupabaseから取得（profilesテーブルがあれば）
-  await loadUserPlan();
-
-  // データ読み込み
-  await loadFromSupabase();
-  renderStreak();
-  applyPlanUI();
-
-  // greeting のユーザー名を更新
-  const greetEl = document.querySelector('.greeting-name em');
-  if (greetEl) greetEl.textContent = name;
-}
-
-// ── ログイン / サインアップ切替 ──
-function toggleAuthMode() {
-  _isSignup = !_isSignup;
-  document.getElementById('login-card-title').textContent = _isSignup ? '新規登録' : 'ログイン';
-  document.getElementById('login-card-sub').textContent = _isSignup
-    ? 'アカウントを作成してVOZを始めましょう'
-    : 'メールアドレスとパスワードを入力してください';
-  document.getElementById('btn-login-submit').textContent = _isSignup ? '登録する' : 'ログイン';
-  document.getElementById('login-toggle-text').textContent = _isSignup ? 'すでにアカウントをお持ちの方は' : 'アカウントをお持ちでない方は';
-  document.getElementById('signup-name-field').style.display = _isSignup ? 'block' : 'none';
-  document.getElementById('login-error').classList.remove('show');
-}
-
-// ── 認証実行 ──
-async function submitAuth() {
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
-  const errEl = document.getElementById('login-error');
-  const btn = document.getElementById('btn-login-submit');
-
-  if (!email || !password) {
-    showAuthError('メールアドレスとパスワードを入力してください');
-    return;
-  }
-  if (_isSignup && password.length < 6) {
-    showAuthError('パスワードは6文字以上で入力してください');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = _isSignup ? '登録中...' : 'ログイン中...';
-  errEl.classList.remove('show');
-
-  try {
-    const endpoint = _isSignup ? 'signup' : 'token?grant_type=password';
-    const body = _isSignup
-      ? {
-          email, password,
-          data: { display_name: document.getElementById('login-name').value.trim() || email.split('@')[0] }
-        }
-      : { email, password };
-
-    const r = await fetch(`${SB_URL}/auth/v1/${endpoint}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY },
-      body: JSON.stringify(body)
-    });
-    const data = await r.json();
-
-    if (!r.ok) {
-      const msg = data.error_description || data.msg || 'エラーが発生しました';
-      // 英語エラーを日本語に
-      const ja = {
-        'Invalid login credentials': 'メールアドレスまたはパスワードが正しくありません',
-        'Email not confirmed': 'メール確認が完了していません。届いたメールのリンクをクリックしてください',
-        'User already registered': 'このメールアドレスはすでに登録されています',
-      };
-      showAuthError(ja[msg] || msg);
-      return;
-    }
-
-    // サインアップ後はメール確認が必要な場合
-    if (_isSignup && !data.access_token) {
-      showAuthError('確認メールを送信しました。メール内のリンクをクリックしてからログインしてください', 'var(--green)');
-      toggleAuthMode(); // ログインモードに戻す
-      return;
-    }
-
-    _session = { ...data, expires_at: data.expires_in ? Math.floor(Date.now()/1000) + data.expires_in : null };
-    localStorage.setItem('voz_session', JSON.stringify(_session));
-    await onLoginSuccess();
-
-  } catch(e) {
-    showAuthError('通信エラーが発生しました。もう一度お試しください');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = _isSignup ? '登録する' : 'ログイン';
-  }
-}
-
-function showAuthError(msg, color) {
-  const el = document.getElementById('login-error');
-  el.textContent = msg;
-  el.style.color = color || '';
-  el.style.background = color ? 'var(--green-soft)' : '';
-  el.classList.add('show');
-}
-
-// Enterキーでログイン
-document.getElementById('login-password').addEventListener('keydown', e => {
-  if (e.key === 'Enter') submitAuth();
-});
-document.getElementById('login-email').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('login-password').focus();
-});
-
-// ── ユーザーメニュー ──
-function toggleUserMenu() {
-  const menu = document.getElementById('user-menu');
-  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-}
-document.addEventListener('click', e => {
-  const menu = document.getElementById('user-menu');
-  if (menu && menu.style.display === 'block') {
-    if (!menu.contains(e.target) && !e.target.classList.contains('user-dot')) {
-      menu.style.display = 'none';
-    }
-  }
-});
-
-// ── ログアウト ──
-async function handleLogout() {
-  try {
-    await fetch(`${SB_URL}/auth/v1/logout`, {
-      method: 'POST',
-      headers: { ...sbHeaders(_session?.access_token), 'Content-Type': 'application/json' }
-    });
-  } catch(e) {}
-  _session = null;
-  localStorage.removeItem('voz_session');
-  document.getElementById('user-menu').style.display = 'none';
-  // リセット
-  sbLessons = []; sbFlashcards = []; sbDict = {}; sbCategories = [];
-  currentTab = 'home';
-  tabs.forEach(t => {
-    document.getElementById('screen-'+t).classList.remove('active');
-    const nav = document.getElementById('nav-'+t);
-    if (nav) nav.classList.remove('active');
-  });
-  document.getElementById('nav-home').classList.add('active');
-  showLoginScreen();
-  showToast('ログアウトしました');
-}
-
-// ── プラン取得（Supabase の profiles テーブルから。なければ localStorage フォールバック） ──
-async function loadUserPlan() {
-  if (!_session) return;
-  try {
-    const rows = await sbGet('profiles', `id=eq.${_session.user.id}&select=plan`, _session.access_token);
-    if (rows && rows[0]?.plan) {
-      currentPlan = rows[0].plan;
-    } else {
-      currentPlan = localStorage.getItem('voz_plan') || 'free';
-    }
-  } catch(e) {
-    currentPlan = localStorage.getItem('voz_plan') || 'free';
-  }
-}
-
-// ══════════════════════════════════════════
-// LESSON VIEWER（アプリ内iframeで開く）
-// ══════════════════════════════════════════
-function openLesson(id) {
-  const lesson = sbLessons.find(l => l.id === id);
-  if (!lesson) return;
-  if (isLocked(lesson)) { showToast('🔒 このレッスンはProプラン限定です'); switchTab('plan'); return; }
-  if (!lesson.url) { showToast('URLが設定されていません'); return; }
-
-  // レッスンビューワーを開く
-  document.getElementById('lesson-view-title').textContent = lesson.name || 'レッスン';
-  document.getElementById('lesson-loading').style.display = 'flex';
-  document.getElementById('lesson-iframe').src = lesson.url;
-  document.getElementById('screen-lesson-view').classList.add('active');
-  // ボトムナビを隠す
-  document.querySelector('.bottom-nav').style.display = 'none';
-}
-
-function closeLessonView() {
-  document.getElementById('screen-lesson-view').classList.remove('active');
-  document.getElementById('lesson-iframe').src = '';
-  document.querySelector('.bottom-nav').style.display = '';
-}
-
-// ══════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════
-let currentPlan = 'free';
+// Supabaseから読み込んだデータ
 let sbLessons = [];
 let sbFlashcards = [];
 let sbDict = {};
 let sbCategories = [];
 
 async function loadFromSupabase() {
-  const token = _session?.access_token;
+  // ローディング状態を表示
   const homeLessons = document.getElementById('home-lessons-container');
   if (homeLessons) homeLessons.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">読み込み中...</div>';
   const lessonsContainer = document.getElementById('lessons-container');
   if (lessonsContainer) lessonsContainer.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">読み込み中...</div>';
 
   const [lessonsRaw, fcRaw, dictRaw, catRaw] = await Promise.all([
-    sbGet('lessons', 'order=date.desc', token),
-    sbGet('flashcards', 'order=created.desc', token),
-    sbGet('dict', '', token),
-    sbGet('fc_categories', 'order=created.asc', token).catch(()=>[]),
+    sbGet('lessons', 'order=date.desc'),
+    sbGet('flashcards', 'order=created.desc'),
+    sbGet('dict'),
+    sbGet('fc_categories', 'order=created.asc').catch(()=>[]),
   ]);
 
+  // visibility に応じてフィルタリング
+  // public  → 全員に表示
+  // members → Proのみ表示（Free には locked として表示）
+  // private → 完全に非表示
   sbLessons = lessonsRaw
     .filter(l => l.visibility !== 'private')
     .map(l => ({
-      id: l.id, name: l.name, url: l.url || '', date: l.date || '',
+      id: l.id,
+      name: l.name,
+      url: l.url || '',
+      date: l.date || '',
       visibility: l.visibility || 'members',
-      status: 'new', step: 0, emoji: '🎬', reviewCount: 0
+      status: 'new',
+      step: 0,
+      emoji: '🎬',
+      reviewCount: 0
     }));
 
+  // private 以外 → 表示対象（Free には members が locked）
   sbFlashcards = fcRaw.filter(f => f.visibility !== 'private');
   sbCategories = (catRaw||[]);
+
   sbDict = {};
-  dictRaw.filter(d => d.visibility !== 'private').forEach(d => { sbDict[d.es] = { ...d }; });
+  dictRaw.filter(d => d.visibility !== 'private').forEach(d => {
+    sbDict[d.es] = { ...d };
+  });
 
   renderHomeLessons();
   renderLessons();
   renderUserCatChips();
+  // カテゴリがあればカテゴリセクションを表示（初期はフレーズ mode）
   if (sbCategories.length > 0) {
     document.getElementById('category-section').style.display = 'block';
   }
+}
+
+function setPlan(plan) {
+  currentPlan = plan;
+  localStorage.setItem('voz_plan', plan);
+  document.getElementById('dev-free').classList.toggle('active', plan === 'free');
+  document.getElementById('dev-pro').classList.toggle('active', plan === 'pro');
+  applyPlanUI();
+  showToast(plan === 'pro' ? '✦ Proプランに切り替えました' : 'Freeプランに切り替えました');
+}
+
+function applyPlanUI() {
+  const isFree = currentPlan === 'free';
+  document.getElementById('free-home-banner').style.display = isFree ? 'block' : 'none';
+  document.getElementById('stat-phrases').classList.toggle('locked', isFree);
+  document.getElementById('stat-days').classList.toggle('locked', isFree);
+  document.getElementById('flash-limit-note').style.display = isFree ? 'block' : 'none';
+  if (isFree) {
+    document.getElementById('card-count').value = 5;
+    document.getElementById('card-count').max = 5;
+  } else {
+    document.getElementById('card-count').max = 50;
+  }
+  if (!isFree) {
+    document.getElementById('category-section').classList.remove('locked');
+    if (sbCategories.length > 0) document.getElementById('category-section').style.display = 'block';
+  } else {
+    // Freeでもカテゴリが存在する場合はロック表示（中身はロック）
+    if (sbCategories.length > 0) document.getElementById('category-section').style.display = 'block';
+  }
+  document.getElementById('plan-already-pro').style.display = isFree ? 'none' : 'block';
+  document.getElementById('plan-upgrade-btn-wrap').style.display = isFree ? 'block' : 'none';
+  // Proのときはボトムナビの「プラン」タブを非表示
+  const navPlan = document.getElementById('nav-plan');
+  if (navPlan) navPlan.style.display = isFree ? 'flex' : 'none';
+  renderLessons();
+  renderHomeLessons();
+  document.getElementById('dev-free').classList.toggle('active', isFree);
+  document.getElementById('dev-pro').classList.toggle('active', !isFree);
 }
 
 // ══════════════════════════════════════════
@@ -1199,7 +890,6 @@ function switchTab(tab) {
     const nav = document.getElementById('nav-'+t);
     if (nav) nav.classList.toggle('active', t === tab);
   });
-  document.getElementById('user-menu').style.display = 'none';
   window.scrollTo(0,0);
 }
 
@@ -1233,38 +923,12 @@ function renderStreak() {
 }
 
 // ══════════════════════════════════════════
-// PLAN UI
+// VOCAB DATA — Supabaseから読み込み
 // ══════════════════════════════════════════
-function applyPlanUI() {
-  const isFree = currentPlan === 'free';
-  document.getElementById('free-home-banner').style.display = isFree ? 'block' : 'none';
-  document.getElementById('stat-phrases').classList.toggle('locked', isFree);
-  document.getElementById('stat-days').classList.toggle('locked', isFree);
-  document.getElementById('flash-limit-note').style.display = isFree ? 'block' : 'none';
-  if (isFree) {
-    document.getElementById('card-count').value = 5;
-    document.getElementById('card-count').max = 5;
-  } else {
-    document.getElementById('card-count').max = 50;
-  }
-  if (!isFree) {
-    document.getElementById('category-section').classList.remove('locked');
-    if (sbCategories.length > 0) document.getElementById('category-section').style.display = 'block';
-  } else {
-    if (sbCategories.length > 0) document.getElementById('category-section').style.display = 'block';
-  }
-  document.getElementById('plan-already-pro').style.display = isFree ? 'none' : 'block';
-  document.getElementById('plan-upgrade-btn-wrap').style.display = isFree ? 'block' : 'none';
-  const navPlan = document.getElementById('nav-plan');
-  if (navPlan) navPlan.style.display = isFree ? 'flex' : 'none';
-  renderLessons();
-  renderHomeLessons();
-}
-
-// ══════════════════════════════════════════
-// VOCAB DATA
-// ══════════════════════════════════════════
+// sbFlashcards と sbDict はloadFromSupabaseで設定される
+// ここでは vocab ビルダーを定義（フラッシュカード用）
 function buildVocabPool() {
+  // sbFlashcards: {id, jp, es, memo, visibility, type, category}
   return sbFlashcards.map(f => ({
     es: f.es, jp: f.jp,
     type: f.type || 'phrase',
@@ -1273,14 +937,19 @@ function buildVocabPool() {
   }));
 }
 
+// ホーム画面のレッスン一覧（最新5件）
 function renderHomeLessons() {
   const container = document.getElementById('home-lessons-container');
   if (!container) return;
-  const lessons = sbLessons.slice(0, 5);
+
+  // 表示対象：private以外（ただしmembersはFreeにはlockedとして表示）
+  const lessons = sbLessons.slice(0, 5); // 最新5件
+
   if (!lessons.length) {
     container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">レッスンがまだありません</div>';
     return;
   }
+
   container.innerHTML = lessons.map(l => {
     const locked = isLocked(l);
     if (locked) {
@@ -1311,101 +980,15 @@ function escapeHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ══════════════════════════════════════════
-// FLASH CARD
-// ══════════════════════════════════════════
-let flashPool=[], flashIdx=0, flashFlipped=false, flashCorrect=0, flashWrong=0, flashWrongCards=[], flashDir='es', flashMode='phrase', flashCat='all';
-
-function selectMode(mode) {
-  flashMode = mode;
-  document.getElementById('mode-phrase').classList.toggle('selected', mode==='phrase');
-  document.getElementById('mode-word').classList.toggle('selected', mode==='word');
-}
-function setDir(d) {
-  flashDir=d;
-  document.getElementById('dir-es').classList.toggle('active',d==='es');
-  document.getElementById('dir-jp').classList.toggle('active',d==='jp');
-}
-function toggleCat(id,el) {
-  if (currentPlan==='free') { showToast('🔒 カテゴリ選択はProプランで'); return; }
-  flashCat=id;
-  document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-}
-function renderUserCatChips() {
-  const wrap = document.getElementById('user-cat-chips');
-  if (!wrap) return;
-  const cats = sbCategories;
-  const allChip = `<div class="cat-chip all-chip selected" onclick="toggleCat('all',this)">すべて</div>`;
-  const chips = cats.map(c => `<div class="cat-chip" onclick="toggleCat('${c.id}',this)">${escapeHtml(c.name)}</div>`).join('');
-  wrap.innerHTML = allChip + chips;
-}
-function startFlash() {
-  let pool = buildVocabPool();
-  if (currentPlan==='free') pool = pool.filter(c=>c.type==='phrase');
-  else if (flashMode==='word') pool = pool.filter(c=>c.type==='word');
-  else pool = pool.filter(c=>c.type==='phrase');
-  if (flashCat!=='all' && currentPlan!=='free') pool=pool.filter(c=>c.cat===flashCat);
-  if (!pool.length) { showToast('カードがありません'); return; }
-  const maxN = currentPlan==='free' ? 5 : parseInt(document.getElementById('card-count').value)||10;
-  flashPool = shuffleArr(pool).slice(0,maxN);
-  flashIdx=0; flashCorrect=0; flashWrong=0; flashWrongCards=[];
-  document.getElementById('flash-setup').style.display='none';
-  document.getElementById('flash-result').style.display='none';
-  document.getElementById('flash-game').style.display='block';
-  showFlashCard();
-}
-function shuffleArr(a) { return [...a].sort(()=>Math.random()-.5); }
-function showFlashCard() {
-  const card=flashPool[flashIdx];
-  if (!card) { showFlashResult(); return; }
-  flashFlipped=false;
-  document.getElementById('flip-card').classList.remove('flipped');
-  document.getElementById('judge-btns').classList.add('hidden');
-  const isFront = flashDir==='es';
-  document.getElementById('front-hint').textContent = isFront ? 'スペイン語' : '日本語';
-  document.getElementById('back-hint').textContent  = isFront ? '日本語' : 'スペイン語';
-  document.getElementById('front-main').textContent = isFront ? card.es : card.jp;
-  document.getElementById('back-main').textContent  = isFront ? card.jp : card.es;
-  document.getElementById('back-sub').textContent   = card.memo||'';
-  const total=flashPool.length;
-  document.getElementById('flash-progress-text').textContent=`${flashIdx+1} / ${total}`;
-  document.getElementById('flash-score-text').innerHTML=`✅ ${flashCorrect} &nbsp; ❌ ${flashWrong}`;
-  document.getElementById('flash-fill').style.width=`${(flashIdx/total)*100}%`;
-}
-function flipCard() {
-  if (flashFlipped) return;
-  flashFlipped=true;
-  document.getElementById('flip-card').classList.add('flipped');
-  document.getElementById('judge-btns').classList.remove('hidden');
-}
-function judge(ok) {
-  if (ok) flashCorrect++; else { flashWrong++; flashWrongCards.push(flashPool[flashIdx]); }
-  flashIdx++;
-  showFlashCard();
-}
-function showFlashResult() {
-  document.getElementById('flash-game').style.display='none';
-  document.getElementById('flash-result').style.display='block';
-  document.getElementById('result-correct').textContent=flashCorrect;
-  document.getElementById('result-wrong').textContent=flashWrong;
-}
-function retryWrong() {
-  if (!flashWrongCards.length) { backToSetup(); return; }
-  flashPool=[...flashWrongCards]; flashIdx=0; flashCorrect=0; flashWrong=0; flashWrongCards=[];
-  document.getElementById('flash-result').style.display='none';
-  document.getElementById('flash-game').style.display='block';
-  showFlashCard();
-}
-function backToSetup() {
-  document.getElementById('flash-game').style.display='none';
-  document.getElementById('flash-result').style.display='none';
-  document.getElementById('flash-setup').style.display='block';
+function openLesson(id) {
+  const lesson = sbLessons.find(l => l.id === id);
+  if (!lesson) return;
+  if (isLocked(lesson)) { showToast('🔒 このレッスンはProプラン限定です'); switchTab('plan'); return; }
+  if (lesson.url) { window.open(lesson.url, '_blank'); return; }
+  showToast('URLが設定されていません');
 }
 
-// ══════════════════════════════════════════
-// DICT
-// ══════════════════════════════════════════
+// ── DICT ──
 function openDict() {
   document.getElementById('dict-sheet').classList.add('show');
   document.getElementById('sheet-overlay').classList.add('show');
@@ -1415,50 +998,169 @@ function closeDict() {
   document.getElementById('dict-sheet').classList.remove('show');
   document.getElementById('sheet-overlay').classList.remove('show');
 }
-function onSearch() {
-  renderDictResults(document.getElementById('search-input').value);
-}
 function renderDictResults(q) {
   const container = document.getElementById('dict-results');
   if (!q) { container.innerHTML = `<div class="dict-empty"><div class="emoji">🔍</div>単語やフレーズを入力してください</div>`; return; }
+  // sbDict: {es: {es, jp, pos, example, trivia, visibility}}
   const allEntries = Object.values(sbDict);
-  let pool = currentPlan === 'free' ? allEntries.filter(d => d.visibility === 'public') : allEntries;
+  let pool = currentPlan === 'free'
+    ? allEntries.filter(d => d.visibility === 'public')
+    : allEntries;
   const results = pool.filter(d =>
     (d.es||'').toLowerCase().includes(q.toLowerCase()) || (d.jp||'').includes(q)
   );
   if (!results.length) {
-    container.innerHTML = `<div class="dict-empty"><div class="emoji">📭</div>「${escapeHtml(q)}」は見つかりませんでした</div>`;
+    const msg = currentPlan === 'free'
+      ? '😶 見つかりません。<br><small style="color:var(--muted)">辞書全検索はProプランで</small>'
+      : `😶「${q}」は見つかりませんでした`;
+    container.innerHTML = `<div class="dict-empty"><div class="emoji">😶</div>${msg}</div>`;
     return;
   }
-  container.innerHTML = results.map(d => {
-    const typeLabel = d.type==='phrase' ? 'フレーズ' : d.pos || '単語';
-    const typeCls   = d.type==='phrase' ? 'type-phrase' : 'type-word';
-    return `<div class="dict-item">
+  container.innerHTML = results.map(d => `
+    <div class="dict-item">
       <div class="dict-item-top">
-        <span class="dict-item-es">${escapeHtml(d.es)}</span>
-        <span class="dict-item-type ${typeCls}">${typeLabel}</span>
+        <div class="dict-item-es">${d.es||''}</div>
+        ${d.pos ? `<span class="dict-item-type type-word">${d.pos}</span>` : ''}
       </div>
-      <div class="dict-item-jp">${escapeHtml(d.jp||'')}</div>
-    </div>`;
-  }).join('');
+      <div class="dict-item-jp">${d.jp||''}</div>
+      ${d.example ? `<div style="font-size:11px;color:var(--muted);margin-top:4px">例: ${d.example}</div>` : ''}
+    </div>
+  `).join('');
+}
+function onSearch() {
+  const q = document.getElementById('search-input').value.trim();
+  renderDictResults(q);
+}
+
+// ── FLASHCARD ──
+let flashMode = 'phrase', flashDir = 'es', flashCats = ['all'];
+let deck = [], deckIdx = 0, correctCount = 0, wrongCount = 0, wrongCards = [], isFlipped = false;
+
+function renderUserCatChips() {
+  const wrap = document.getElementById('user-cat-chips');
+  if (!wrap) return;
+  let html = `<div class="cat-chip all-chip selected" onclick="toggleCat('all',this)">すべて</div>`;
+  sbCategories.forEach(c => {
+    html += `<div class="cat-chip" onclick="toggleCat('${c.id}',this)">${escapeHtml(c.name)}</div>`;
+  });
+  wrap.innerHTML = html;
+  flashCats = ['all'];
+}
+
+function selectMode(mode) {
+  if (mode === 'word' && currentPlan === 'free') {
+    showToast('🔒 単語モードはProプラン限定です');
+    return;
+  }
+  flashMode = mode;
+  document.getElementById('mode-phrase').classList.toggle('selected', mode==='phrase');
+  document.getElementById('mode-word').classList.toggle('selected', mode==='word');
+  // フレーズ・単語どちらもカテゴリ表示（カテゴリがある場合）
+  const hasCats = sbCategories.length > 0;
+  document.getElementById('category-section').style.display = hasCats ? 'block' : 'none';
+}
+function toggleCat(cat, el) {
+  if (currentPlan === 'free') { showToast('🔒 カテゴリ選択はProプラン限定です'); return; }
+  if (cat==='all') {
+    flashCats=['all'];
+    document.querySelectorAll('#user-cat-chips .cat-chip').forEach(c=>c.classList.remove('selected'));
+    el.classList.add('selected');
+    return;
+  }
+  flashCats = flashCats.filter(c=>c!=='all');
+  document.querySelector('#user-cat-chips .all-chip')?.classList.remove('selected');
+  if (flashCats.includes(cat)) { flashCats=flashCats.filter(c=>c!==cat); el.classList.remove('selected'); }
+  else { flashCats.push(cat); el.classList.add('selected'); }
+  if (!flashCats.length) { flashCats=['all']; document.querySelector('#user-cat-chips .all-chip')?.classList.add('selected'); }
+}
+function setDir(dir) {
+  flashDir = dir;
+  document.getElementById('dir-es').classList.toggle('active', dir==='es');
+  document.getElementById('dir-jp').classList.toggle('active', dir==='jp');
+}
+function startFlash() {
+  const pool = buildVocabPool().filter(v => {
+    if (currentPlan === 'free' && v.visibility !== 'public') return false;
+    // mode filter: phrase/word
+    if (flashMode !== 'all' && v.type !== flashMode) return false;
+    // category filter
+    if (!flashCats.includes('all') && !flashCats.includes(v.cat)) return false;
+    return true;
+  }).sort(()=>Math.random()-.5);
+  const maxCards = currentPlan === 'free' ? 5 : 50;
+  const count = Math.min(parseInt(document.getElementById('card-count').value)||5, pool.length, maxCards);
+  if (!count) { showToast('表示できるカードがありません'); return; }
+  deck = pool.slice(0,count);
+  deckIdx=0; correctCount=0; wrongCount=0; wrongCards=[];
+  document.getElementById('flash-setup').style.display='none';
+  document.getElementById('flash-game').style.display='block';
+  document.getElementById('flash-result').style.display='none';
+  showCard();
+}
+function showCard() {
+  if (deckIdx>=deck.length) { showResult(); return; }
+  const card = deck[deckIdx]; isFlipped = false;
+  document.getElementById('flip-card').classList.remove('flipped');
+  document.getElementById('judge-btns').classList.add('hidden');
+  document.getElementById('front-hint').textContent = flashDir==='es'?'スペイン語':'日本語';
+  document.getElementById('front-main').textContent = flashDir==='es'?card.es:card.jp;
+  document.getElementById('back-hint').textContent  = flashDir==='es'?'日本語':'スペイン語';
+  document.getElementById('back-main').textContent  = flashDir==='es'?card.jp:card.es;
+  document.getElementById('back-sub').textContent   = flashDir==='es'?card.es:card.jp;
+  const pct = (deckIdx/deck.length)*100;
+  document.getElementById('flash-fill').style.width = pct+'%';
+  document.getElementById('flash-progress-text').textContent = `${deckIdx+1} / ${deck.length}`;
+  document.getElementById('flash-score-text').innerHTML = `✅ ${correctCount} &nbsp; ❌ ${wrongCount}`;
+}
+function flipCard() {
+  if (isFlipped) return; isFlipped=true;
+  document.getElementById('flip-card').classList.add('flipped');
+  setTimeout(()=>document.getElementById('judge-btns').classList.remove('hidden'),300);
+}
+function judge(correct) {
+  if (correct) correctCount++; else { wrongCount++; wrongCards.push(deck[deckIdx]); }
+  deckIdx++; showCard();
+}
+function showResult() {
+  document.getElementById('flash-game').style.display='none';
+  document.getElementById('flash-result').style.display='block';
+  document.getElementById('result-correct').textContent=correctCount;
+  document.getElementById('result-wrong').textContent=wrongCount;
+  document.getElementById('flash-fill').style.width='100%';
+  document.querySelector('.btn-retry').style.display = wrongCards.length?'flex':'none';
+}
+function retryWrong() {
+  deck=wrongCards.sort(()=>Math.random()-.5); deckIdx=0; correctCount=0; wrongCount=0; wrongCards=[];
+  document.getElementById('flash-result').style.display='none';
+  document.getElementById('flash-game').style.display='block';
+  showCard();
+}
+function backToSetup() {
+  document.getElementById('flash-result').style.display='none';
+  document.getElementById('flash-game').style.display='none';
+  document.getElementById('flash-setup').style.display='block';
 }
 
 // ══════════════════════════════════════════
-// LESSONS
+// LESSONS — Supabaseから読み込み
 // ══════════════════════════════════════════
+// FREE_LESSON_LIMIT: Freeで使えるレッスン数（無料公開レッスンは除外）
 const FREE_LESSON_LIMIT = 3;
 const ACTION_LABEL = { done:'復習する', wip:'再開する', new:'始める', locked:'🔒 Pro限定' };
 const STEPS = 5, MAX_STARS = 3;
 let currentView = 'list', currentFilter = 'all';
 
+// isLocked: freeかつmembers限定かつFREE_LESSON_LIMIT超え
 function isLocked(lesson) {
-  if (lesson.visibility === 'public') return false;
+  if (lesson.visibility === 'public') return false; // 無料公開は常にアクセス可
   return currentPlan === 'free';
 }
 function starsHTML(count) {
   return Array.from({length:MAX_STARS},(_,i)=>`<span class="star ${i<count?'filled':'empty'}">⭐</span>`).join('');
 }
-function onAction(lessonId) { openLesson(lessonId); }
+function onAction(lessonId) {
+  openLesson(lessonId);
+}
 function setView(v) {
   currentView=v;
   document.getElementById('btn-card').classList.toggle('active',v==='card');
@@ -1490,10 +1192,12 @@ function renderLessons() {
   if (countEl) countEl.textContent = `${filtered.length}件`;
   const container = document.getElementById('lessons-container');
   if (!container) return;
+
   if (!filtered.length) {
     container.innerHTML=`<div class="empty-msg"><div class="emoji">📭</div>${lessons.length ? '該当するレッスンがありません' : '読み込み中...'}</div>`;
     return;
   }
+
   if (currentView==='card') {
     container.innerHTML = `<div class="card-grid">${filtered.map(l=>{
       const locked = isLocked(l);
@@ -1535,7 +1239,9 @@ function renderLessons() {
 // ══════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════
-initAuth();
+renderStreak();
+applyPlanUI();
+loadFromSupabase(); // Supabaseからデータを読み込んで反映
 </script>
 </body>
 </html>
