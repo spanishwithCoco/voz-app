@@ -464,32 +464,98 @@ body {
 }
 #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-/* ── PLAN SWITCHER (dev only) ── */
-.dev-switcher {
-  position: fixed; top: 70px; right: 12px; z-index: 300;
-  background: var(--text); border-radius: 12px; padding: 8px 12px;
-  display: flex; gap: 6px; align-items: center;
+/* ── LOGIN SCREEN ── */
+.login-screen {
+  display: none; min-height: 100vh;
+  align-items: center; justify-content: center;
+  padding: 24px 20px; background: var(--bg);
+}
+.login-screen.active { display: flex; }
+.login-box {
+  width: 100%; max-width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px; padding: 36px 28px;
   box-shadow: var(--shadow-lg);
 }
-.dev-label { font-size: 9px; color: rgba(255,255,255,.5); font-family: 'Space Mono', monospace; white-space: nowrap; }
-.dev-btn { padding: 4px 10px; border: none; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all .15s; background: rgba(255,255,255,.1); color: rgba(255,255,255,.6); font-family: 'DM Sans', sans-serif; }
-.dev-btn.active { background: var(--accent); color: #fff; }
+.login-logo {
+  font-family: 'Fraunces', serif; font-size: 36px;
+  font-weight: 700; color: var(--accent);
+  text-align: center; margin-bottom: 4px;
+}
+.login-logo-sub {
+  font-size: 12px; color: var(--muted);
+  text-align: center; margin-bottom: 28px;
+  font-family: 'Space Mono', monospace;
+}
+.login-tab-bar {
+  display: flex; background: var(--surface2);
+  border-radius: 10px; padding: 3px; margin-bottom: 22px; gap: 3px;
+}
+.login-tab {
+  flex: 1; padding: 8px; border: none; background: none;
+  border-radius: 8px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600; color: var(--muted);
+  cursor: pointer; transition: all .15s;
+}
+.login-tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+.login-label { font-size: 12px; color: var(--muted); margin-bottom: 5px; display: block; }
+.login-input {
+  width: 100%; padding: 11px 14px; margin-bottom: 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; color: var(--text); transition: border-color .18s;
+}
+.login-input:focus { outline: none; border-color: var(--accent); }
+.login-btn {
+  width: 100%; padding: 13px; background: var(--accent); color: #fff;
+  border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif;
+  font-weight: 700; font-size: 15px; cursor: pointer; transition: all .2s;
+  margin-top: 4px; box-shadow: 0 3px 12px rgba(200,96,26,.3);
+}
+.login-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(200,96,26,.35); }
+.login-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+.login-error {
+  color: var(--red); font-size: 12px; text-align: center;
+  margin-top: 8px; min-height: 18px;
+}
 </style>
 </head>
 <body>
 
-<!-- ══════════════ DEV PLAN SWITCHER (開発確認用) ══════════════ -->
-<div class="dev-switcher">
-  <span class="dev-label">プラン確認：</span>
-  <button class="dev-btn active" id="dev-free" onclick="setPlan('free')">Free</button>
-  <button class="dev-btn" id="dev-pro" onclick="setPlan('pro')">Pro</button>
+<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<div class="login-screen active" id="screen-login">
+  <div class="login-box">
+    <div class="login-logo">VOZ.</div>
+    <div class="login-logo-sub">escucha, copia, hazlo tu voz.</div>
+    <div class="login-tab-bar">
+      <button class="login-tab active" id="tab-login" onclick="switchLoginTab('login')">ログイン</button>
+      <button class="login-tab" id="tab-signup" onclick="switchLoginTab('signup')">新規登録</button>
+    </div>
+    <div id="login-form">
+      <label class="login-label">メールアドレス</label>
+      <input class="login-input" type="email" id="login-email" placeholder="your@email.com">
+      <label class="login-label">パスワード</label>
+      <input class="login-input" type="password" id="login-password" placeholder="••••••••">
+      <button class="login-btn" id="login-btn" onclick="doLogin()">ログイン</button>
+      <div class="login-error" id="login-error"></div>
+    </div>
+    <div id="signup-form" style="display:none">
+      <label class="login-label">メールアドレス</label>
+      <input class="login-input" type="email" id="signup-email" placeholder="your@email.com">
+      <label class="login-label">パスワード（6文字以上）</label>
+      <input class="login-input" type="password" id="signup-password" placeholder="••••••••">
+      <button class="login-btn" id="signup-btn" onclick="doSignup()">登録する</button>
+      <div class="login-error" id="signup-error"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ══════════════ HOME ══════════════ -->
-<div class="screen active" id="screen-home">
+<div class="screen" id="screen-home">
   <div class="top-bar">
     <div class="top-bar-logo">VOZ.<span>escucha, copia, hazlo tu voz.</span></div>
-    <div class="user-dot" onclick="switchTab('plan')" title="プランを見る">Y</div>
+    <button class="user-dot" onclick="doLogout()" title="ログアウト" style="font-size:11px;font-family:'DM Sans',sans-serif;font-weight:700;border:none;cursor:pointer">出る</button>
   </div>
   <div class="main">
     <div class="greeting">
@@ -742,7 +808,7 @@ body {
 <div id="toast"></div>
 
 <!-- ══════════════ BOTTOM NAV ══════════════ -->
-<nav class="bottom-nav">
+<nav class="bottom-nav" style="display:none">
   <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
     <span class="nav-icon">🏠</span><span class="nav-label">ホーム</span>
   </button>
@@ -763,7 +829,7 @@ body {
 // ══════════════════════════════════════════
 const SB_URL = 'https://vnzkjkyvagqnfrqsoijw.supabase.co';
 const SB_KEY = 'sb_publishable_pCakxmFfDkTMJFjkcOdobw_5Tnt5Vmg';
-const sbH = {
+let sbH = {
   'Content-Type': 'application/json',
   'apikey': SB_KEY,
   'Authorization': 'Bearer ' + SB_KEY
@@ -777,10 +843,153 @@ async function sbGet(table, params='') {
 }
 
 // ══════════════════════════════════════════
-// STATE — プランはlocalStorage（開発確認用）
+// AUTH — Supabase認証
 // ══════════════════════════════════════════
-let currentPlan = localStorage.getItem('voz_plan') || 'free'; // 'free' | 'pro'
+let _session = null;
+let currentPlan = 'free'; // 'free' | 'pro'（Supabaseのplanから取得）
 
+function loadSession() {
+  try {
+    const raw = localStorage.getItem('voz_user_session');
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (s.expires_at && Date.now() / 1000 > s.expires_at) {
+      localStorage.removeItem('voz_user_session');
+      return null;
+    }
+    return s;
+  } catch { return null; }
+}
+function saveSession(session) {
+  _session = session;
+  localStorage.setItem('voz_user_session', JSON.stringify(session));
+  sbH['Authorization'] = 'Bearer ' + session.access_token;
+}
+function clearSession() {
+  _session = null;
+  localStorage.removeItem('voz_user_session');
+  sbH['Authorization'] = 'Bearer ' + SB_KEY;
+}
+
+async function fetchPlan() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/profiles?id=eq.${_session.user.id}&select=plan`, { headers: sbH });
+    const data = await r.json();
+    const p = data?.[0]?.plan || 'free';
+    // paid と special は両方 pro 扱い
+    return (p === 'paid' || p === 'special') ? 'pro' : 'free';
+  } catch { return 'free'; }
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  if (!email || !password) { errEl.textContent = 'メールアドレスとパスワードを入力してください'; return; }
+  btn.textContent = 'ログイン中...'; btn.disabled = true; errEl.textContent = '';
+  try {
+    const r = await fetch(`${SB_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error_description || 'ログインに失敗しました');
+    saveSession(data);
+    await onAuthSuccess();
+  } catch(e) {
+    errEl.textContent = e.message;
+    btn.textContent = 'ログイン'; btn.disabled = false;
+  }
+}
+
+async function doSignup() {
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const errEl = document.getElementById('signup-error');
+  const btn = document.getElementById('signup-btn');
+  if (!email || !password) { errEl.textContent = 'メールアドレスとパスワードを入力してください'; return; }
+  if (password.length < 6) { errEl.textContent = 'パスワードは6文字以上にしてください'; return; }
+  btn.textContent = '登録中...'; btn.disabled = true; errEl.textContent = '';
+  try {
+    const r = await fetch(`${SB_URL}/auth/v1/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error_description || '登録に失敗しました');
+    if (data.access_token) {
+      saveSession(data);
+      await onAuthSuccess();
+    } else {
+      errEl.style.color = 'var(--green)';
+      errEl.textContent = '確認メールを送信しました。メールのリンクをクリックしてからログインしてください。';
+      btn.textContent = '登録する'; btn.disabled = false;
+    }
+  } catch(e) {
+    errEl.textContent = e.message;
+    btn.textContent = '登録する'; btn.disabled = false;
+  }
+}
+
+async function doLogout() {
+  try {
+    await fetch(`${SB_URL}/auth/v1/logout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY,
+                 'Authorization': 'Bearer ' + (_session?.access_token || SB_KEY) }
+    });
+  } catch(e) {}
+  clearSession();
+  showLoginScreen();
+}
+
+async function onAuthSuccess() {
+  currentPlan = await fetchPlan();
+  showAppScreens();
+  applyPlanUI();
+  loadFromSupabase();
+}
+
+function showLoginScreen() {
+  document.getElementById('screen-login').classList.add('active');
+  document.querySelectorAll('.screen:not(#screen-login)').forEach(s => s.classList.remove('active'));
+  document.querySelector('.bottom-nav').style.display = 'none';
+}
+
+function showAppScreens() {
+  document.getElementById('screen-login').classList.remove('active');
+  document.getElementById('screen-home').classList.add('active');
+  document.querySelector('.bottom-nav').style.display = 'flex';
+  currentTab = 'home';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navHome = document.getElementById('nav-home');
+  if (navHome) navHome.classList.add('active');
+}
+
+function switchLoginTab(tab) {
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+}
+
+// ── 起動時セッション復元 ──
+(async () => {
+  const session = loadSession();
+  if (session) {
+    saveSession(session);
+    await onAuthSuccess();
+  } else {
+    showLoginScreen();
+  }
+})();
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
 // Supabaseから読み込んだデータ
 let sbLessons = [];
 let sbFlashcards = [];
@@ -837,14 +1046,7 @@ async function loadFromSupabase() {
   }
 }
 
-function setPlan(plan) {
-  currentPlan = plan;
-  localStorage.setItem('voz_plan', plan);
-  document.getElementById('dev-free').classList.toggle('active', plan === 'free');
-  document.getElementById('dev-pro').classList.toggle('active', plan === 'pro');
-  applyPlanUI();
-  showToast(plan === 'pro' ? '✦ Proプランに切り替えました' : 'Freeプランに切り替えました');
-}
+// setPlan: 削除（Supabaseのplanで管理）
 
 function applyPlanUI() {
   const isFree = currentPlan === 'free';
@@ -872,8 +1074,6 @@ function applyPlanUI() {
   if (navPlan) navPlan.style.display = isFree ? 'flex' : 'none';
   renderLessons();
   renderHomeLessons();
-  document.getElementById('dev-free').classList.toggle('active', isFree);
-  document.getElementById('dev-pro').classList.toggle('active', !isFree);
 }
 
 // ══════════════════════════════════════════
@@ -1237,11 +1437,9 @@ function renderLessons() {
 }
 
 // ══════════════════════════════════════════
-// INIT
+// INIT（認証後に onAuthSuccess() 経由で呼ばれる）
 // ══════════════════════════════════════════
 renderStreak();
-applyPlanUI();
-loadFromSupabase(); // Supabaseからデータを読み込んで反映
 </script>
 </body>
 </html>
